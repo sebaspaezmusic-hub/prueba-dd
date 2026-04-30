@@ -423,6 +423,20 @@ function showAuthOverlay() {
 
 async function signIn() {
   const btn = document.getElementById('sign-in-btn');
+  const errEl = document.getElementById('auth-error');
+  errEl.style.display = 'none';
+
+  // Make sure msalInstance is ready
+  if (!msalInstance) {
+    try {
+      await appInit();
+    } catch(e) {
+      errEl.style.display = 'block';
+      errEl.textContent = 'Error inicializando autenticación. Recarga la página.';
+      return;
+    }
+  }
+
   btn.disabled = true;
   btn.textContent = 'Iniciando sesión...';
   try {
@@ -433,11 +447,10 @@ async function signIn() {
     console.error('Login error:', e);
     btn.disabled = false;
     btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 21 21" fill="none"><path d="M10 1H1v9h9V1zM20 1h-9v9h9V1zM10 11H1v9h9v-9zM20 11h-9v9h9v-9z" fill="currentColor" opacity=".6"/></svg>Iniciar sesión con Microsoft';
-    const errEl = document.getElementById('auth-error');
     errEl.style.display = 'block';
     errEl.textContent = e.errorCode === 'popup_window_error'
       ? 'El popup fue bloqueado. Permite popups para este sitio e intenta de nuevo.'
-      : 'Error al iniciar sesión: ' + (e.errorMessage || e.message || 'Error desconocido');
+      : 'Error: ' + (e.errorMessage || e.message || 'Error desconocido');
   }
 }
 
@@ -1220,10 +1233,10 @@ function showToast(msg, type) {
   t._timer = setTimeout(function(){t.classList.remove('show');}, 3500);
 }
 
-// Simple init on window load (after all scripts including MSAL are ready)
+// Init: appInit runs on load, sign-in button calls signIn directly
 window.addEventListener('load', function() {
   document.getElementById('sign-in-btn').onclick = signIn;
-  appInit();
+  appInit().catch(function(e) { console.log('appInit error:', e); });
 });
 </script>
 </body>
