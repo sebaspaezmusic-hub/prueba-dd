@@ -1220,31 +1220,10 @@ function showToast(msg, type) {
   t._timer = setTimeout(function(){t.classList.remove('show');}, 3500);
 }
 
-// Wait for MSAL to be available, then initialize
-function waitForMsal(retries) {
-  if (typeof msal !== 'undefined') {
-    appInit();
-  } else if (retries > 0) {
-    setTimeout(function() { waitForMsal(retries - 1); }, 100);
-  } else {
-    document.getElementById('auth-error').style.display = 'block';
-    document.getElementById('auth-error').textContent = 'No se pudo cargar la librería de autenticación. Verifica tu conexión e intenta de nuevo.';
-    document.getElementById('sign-in-btn').disabled = false;
-    document.getElementById('sign-in-btn').onclick = function() {
-      document.getElementById('auth-error').textContent = 'Recarga la página e intenta de nuevo.';
-    };
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Wire up sign-in button immediately so it shows feedback
-  document.getElementById('sign-in-btn').onclick = function() {
-    document.getElementById('sign-in-btn').disabled = true;
-    document.getElementById('sign-in-btn').textContent = 'Cargando...';
-    waitForMsal(20);
-  };
-  // Start waiting for MSAL
-  waitForMsal(50);
+// Simple init on window load (after all scripts including MSAL are ready)
+window.addEventListener('load', function() {
+  document.getElementById('sign-in-btn').onclick = signIn;
+  appInit();
 });
 </script>
 </body>
