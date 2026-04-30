@@ -387,7 +387,7 @@ async function appInit() {
   msalInstance = new msal.PublicClientApplication({
     auth: {
       clientId: SP_CONFIG.clientId,
-      authority: 'https://login.microsoftonline.com/common',
+      authority: 'https://login.microsoftonline.com/4e8ad5fd-3b35-462b-bf95-8eacd4641ce5',
       redirectUri: window.location.href.split('?')[0].split('#')[0]
     },
     cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
