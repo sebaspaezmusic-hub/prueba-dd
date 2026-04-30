@@ -329,6 +329,14 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 <div class="toast" id="toast"></div>
 
 <!-- MSAL loaded last, then app initializes -->
+<script>
+function msalLoadError() {
+  document.getElementById('auth-error').style.display = 'block';
+  document.getElementById('auth-error').textContent = 'Error cargando librería de autenticación. Verifica tu conexión.';
+  document.getElementById('sign-in-btn').disabled = false;
+  document.getElementById('sign-in-btn').textContent = 'Iniciar sesión con Microsoft';
+}
+</script>
 <script src="https://unpkg.com/@azure/msal-browser@2.38.0/dist/msal-browser.min.js" onload="appInit()" onerror="msalLoadError()"></script>
 <script>
 // ══════════════════════════════════════════════════════
