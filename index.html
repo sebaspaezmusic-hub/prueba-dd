@@ -21,7 +21,7 @@
   --shadow-md:0 4px 16px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
+body{font-family:sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
 
 
 /* AUTH */
@@ -30,14 +30,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);fon
 .auth-logo{width:48px;height:48px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;margin:0 auto 20px;}
 .auth-title{font-size:20px;font-weight:600;letter-spacing:-0.3px;margin-bottom:8px;}
 .auth-sub{font-size:13.5px;color:var(--text3);margin-bottom:28px;line-height:1.6;}
-.auth-btn{width:100%;padding:12px;background:var(--red);color:white;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.15s;}
+.auth-btn{width:100%;padding:12px;background:var(--red);color:white;border:none;border-radius:var(--radius-sm);font-family:sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.15s;}
 .auth-btn:hover{background:var(--red-dark);}
 .auth-btn:disabled{background:var(--text3);cursor:not-allowed;}
 .auth-user{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius-sm);background:var(--surface2);cursor:pointer;transition:background 0.15s;}
 .auth-user:hover{background:var(--border);}
 .auth-avatar{width:28px;height:28px;border-radius:50%;background:var(--red);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
 .auth-name{font-size:13px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sync-indicator{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
+.sync-indicator{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-family:monospace;}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
 .sync-dot.loading{background:var(--amber);animation:pulse 1s infinite;}
 .sync-dot.error{background:var(--red);}
@@ -47,7 +47,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .logo{display:flex;align-items:center;gap:12px;}
 .logo-mark{width:32px;height:32px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:13px;}
 .logo-text{font-size:14px;font-weight:500;letter-spacing:-0.2px;}
-.logo-sub{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.5px;}
+.logo-sub{font-size:11px;color:var(--text3);font-family:monospace;letter-spacing:0.5px;}
 .header-right{display:flex;align-items:center;gap:8px;}
 
 /* LAYOUT */
@@ -56,13 +56,13 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 /* SIDEBAR */
 .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;flex-shrink:0;overflow-y:auto;}
 .nav-section{padding:0 12px;margin-bottom:4px;}
-.nav-label{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--text3);padding:0 8px;margin-bottom:6px;text-transform:uppercase;}
+.nav-label{font-size:10px;font-family:monospace;letter-spacing:1px;color:var(--text3);padding:0 8px;margin-bottom:6px;text-transform:uppercase;}
 .nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13.5px;transition:all 0.15s;}
 .nav-item:hover{background:var(--surface2);color:var(--text);}
 .nav-item.active{background:var(--red-soft);color:var(--red);font-weight:500;}
 .nav-icon{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.7;}
 .nav-item.active .nav-icon{opacity:1;}
-.nav-count{margin-left:auto;font-size:11px;font-family:'DM Mono',monospace;background:var(--surface2);padding:1px 6px;border-radius:10px;color:var(--text3);}
+.nav-count{margin-left:auto;font-size:11px;font-family:monospace;background:var(--surface2);padding:1px 6px;border-radius:10px;color:var(--text3);}
 .nav-item.active .nav-count{background:var(--red-mid);color:var(--red-dark);}
 .alert-dot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:auto;flex-shrink:0;animation:pulse 2s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
@@ -74,7 +74,7 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 .page-sub{font-size:13px;color:var(--text3);margin-top:2px;}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-family:sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap;}
 .btn-primary{background:var(--red);color:white;}
 .btn-primary:hover{background:var(--red-dark);}
 .btn-secondary{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
@@ -87,29 +87,29 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:0
 /* STATS */
 .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;}
-.stat-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.stat-label{font-size:11px;font-family:monospace;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
 .stat-value{font-size:26px;font-weight:600;letter-spacing:-1px;color:var(--text);line-height:1;}
 .stat-meta{font-size:12px;color:var(--text3);margin-top:4px;}
 
 /* FILTERS */
 .filters{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
-.filter-input{flex:1;min-width:200px;max-width:280px;padding:7px 12px 7px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s;}
+.filter-input{flex:1;min-width:200px;max-width:280px;padding:7px 12px 7px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s;}
 .filter-input:focus{border-color:var(--red);}
 .search-wrap{position:relative;}
 .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;}
-.filter-select{padding:7px 28px 7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text2);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239C9A94'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.15s;}
+.filter-select{padding:7px 28px 7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:sans-serif;font-size:13.5px;background:var(--surface);color:var(--text2);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239C9A94'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.15s;}
 .filter-select:focus{border-color:var(--red);}
 
 /* TABLE */
 .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
 table{width:100%;border-collapse:collapse;}
-thead th{padding:10px 16px;text-align:left;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;user-select:none;}
+thead th{padding:10px 16px;text-align:left;font-size:11px;font-family:monospace;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;user-select:none;}
 tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;cursor:pointer;}
 tbody tr:last-child{border-bottom:none;}
 tbody tr:hover{background:var(--bg);}
 tbody tr.selected{background:var(--red-soft);}
 td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
-.td-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);white-space:nowrap;}
+.td-id{font-family:monospace;font-size:12px;color:var(--text3);white-space:nowrap;}
 .td-id.has-bp{color:var(--blue);font-weight:500;}
 .td-name{font-weight:500;}
 .td-sub{font-size:12px;color:var(--text3);margin-top:1px;}
@@ -118,8 +118,8 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 .badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11.5px;font-weight:500;white-space:nowrap;}
 .badge-ap{background:var(--blue-bg);color:var(--blue);}
 .badge-exp{background:var(--amber-bg);color:var(--amber);}
-.badge-etapa{background:var(--surface2);color:var(--text2);font-size:11px;font-family:'DM Mono',monospace;}
-.badge-prebp{background:var(--purple-bg);color:var(--purple);font-size:11px;font-family:'DM Mono',monospace;}
+.badge-etapa{background:var(--surface2);color:var(--text2);font-size:11px;font-family:monospace;}
+.badge-prebp{background:var(--purple-bg);color:var(--purple);font-size:11px;font-family:monospace;}
 .badge-working{background:var(--green-bg);color:var(--green);}
 .badge-no{background:#F5F5F5;color:var(--text3);}
 
@@ -127,7 +127,7 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 .progress-wrap{display:flex;align-items:center;gap:8px;}
 .progress-bar{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;min-width:60px;}
 .progress-fill{height:100%;background:var(--red);border-radius:2px;}
-.progress-pct{font-size:12px;font-family:'DM Mono',monospace;color:var(--text3);white-space:nowrap;min-width:32px;}
+.progress-pct{font-size:12px;font-family:monospace;color:var(--text3);white-space:nowrap;min-width:32px;}
 
 /* ALERTS PAGE */
 .alerts-grid{display:flex;flex-direction:column;gap:16px;}
@@ -150,7 +150,7 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 .chip-high{background:var(--orange-bg);color:var(--orange);}
 .chip-medium{background:#FFFDE7;color:#8A6A00;}
 .chip-stale{background:var(--surface2);color:var(--text3);}
-.alert-date{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);white-space:nowrap;}
+.alert-date{font-family:monospace;font-size:12px;color:var(--text2);white-space:nowrap;}
 .alert-empty{padding:32px 20px;text-align:center;color:var(--text3);font-size:13px;}
 
 /* DETAIL PANEL */
@@ -158,14 +158,14 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 @keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
 .detail-panel.open{display:block;}
 .detail-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
-.detail-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px;}
+.detail-id{font-family:monospace;font-size:11px;color:var(--text3);margin-bottom:4px;}
 .detail-title{font-size:16px;font-weight:600;letter-spacing:-0.3px;margin-bottom:8px;}
 .detail-body{padding:20px 24px;}
 .detail-section{margin-bottom:24px;}
-.detail-section-title{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:12px;}
+.detail-section-title{font-size:10px;font-family:monospace;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:12px;}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .detail-field{display:flex;flex-direction:column;gap:2px;}
-.detail-field-label{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+.detail-field-label{font-size:11px;color:var(--text3);font-family:monospace;}
 .detail-field-value{font-size:13.5px;color:var(--text);font-weight:500;}
 .detail-field-value.empty{color:var(--text3);font-weight:400;font-style:italic;}
 .etapa-track{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
@@ -177,13 +177,13 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 .etapa-step.current .etapa-dot{background:var(--red);}
 .pits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
 .pit-cell{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;}
-.pit-cell-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.pit-cell-label{font-size:10px;font-family:monospace;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
 .pit-cell-value{font-size:20px;font-weight:600;letter-spacing:-0.5px;color:var(--text);}
 .pit-cell.diff .pit-cell-value{color:var(--green);}
 .pit-cell.diff .pit-cell-value.negative{color:#C62828;}
 .candidate-card{padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;}
 .candidate-name{font-weight:500;font-size:13.5px;margin-bottom:2px;}
-.candidate-meta{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
+.candidate-meta{font-size:12px;color:var(--text3);font-family:monospace;}
 
 /* BP NOTICE */
 .bp-notice{background:var(--blue-bg);border:1px solid #C5D8F8;border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;}
@@ -197,30 +197,30 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 @keyframes modalIn{from{opacity:0;transform:translateY(-12px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
 .modal-header{padding:24px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;}
 .modal-title{font-size:17px;font-weight:600;letter-spacing:-0.3px;}
-.modal-sub{font-size:12px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace;}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:2px;font-family:monospace;}
 .modal-body{padding:24px 28px;max-height:65vh;overflow-y:auto;}
 .modal-footer{padding:16px 28px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .modal-footer-right{display:flex;gap:8px;}
 
 /* FORM */
 .form-section{margin-bottom:24px;}
-.form-section-title{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.form-section-title{font-size:11px;font-family:monospace;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
 .form-full{grid-column:1/-1;}
 .field{display:flex;flex-direction:column;gap:5px;}
 .field label{font-size:12px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:4px;}
 .required{color:var(--red);font-size:13px;line-height:1;}
-.req-etapa{color:var(--orange);font-size:10px;font-family:'DM Mono',monospace;font-weight:400;background:var(--orange-bg);padding:1px 6px;border-radius:3px;}
-.optional-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);font-weight:400;}
-.field input,.field select,.field textarea{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s,box-shadow 0.15s;width:100%;}
+.req-etapa{color:var(--orange);font-size:10px;font-family:monospace;font-weight:400;background:var(--orange-bg);padding:1px 6px;border-radius:3px;}
+.optional-tag{font-size:10px;font-family:monospace;color:var(--text3);font-weight:400;}
+.field input,.field select,.field textarea{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s,box-shadow 0.15s;width:100%;}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(204,0,0,0.08);}
 .field input.error,.field select.error{border-color:#E53935;background:#FFF8F8;}
 .field-error{font-size:11.5px;color:#E53935;display:none;}
 .field-error.show{display:block;}
 .field input:disabled,.field select:disabled{background:var(--surface2);color:var(--text3);cursor:not-allowed;}
 .field textarea{resize:vertical;min-height:72px;}
-.id-preview{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);letter-spacing:0.5px;}
+.id-preview{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:monospace;font-size:13px;color:var(--text3);letter-spacing:0.5px;}
 .date-highlight{border-color:var(--orange) !important;background:#FFFBF5 !important;}
 .date-highlight:focus{border-color:var(--red) !important;}
 
@@ -243,7 +243,7 @@ td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
 
 /* BP MODAL */
 .bp-assign-box{background:var(--blue-bg);border:1px solid #C5D8F8;border-radius:var(--radius);padding:20px;text-align:center;margin:16px 0;}
-.bp-assign-id{font-family:'DM Mono',monospace;font-size:28px;font-weight:600;color:var(--blue);letter-spacing:1px;margin:8px 0;}
+.bp-assign-id{font-family:monospace;font-size:28px;font-weight:600;color:var(--blue);letter-spacing:1px;margin:8px 0;}
 
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:12px 18px;border-radius:var(--radius);font-size:13.5px;font-weight:500;box-shadow:var(--shadow-md);z-index:300;display:none;align-items:center;gap:8px;animation:toastIn 0.2s ease;max-width:360px;}
@@ -976,13 +976,13 @@ function renderTable() {
     const dateStyle=days!==null&&days>=0&&days<=120?'color:var(--red);font-weight:500':'';
     return `<tr onclick="openDetail('${p.id}')" class="${selectedId===p.id?'selected':''}">
       <td style="padding:12px 8px 12px 16px;width:28px"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span title="${sem.label}" style="color:${sem.color};font-size:14px;line-height:1">●</span><span title="Prioridad: ${p.tipoPriorizacion||'Sin definir'}" style="color:${prioColor};font-size:8px;line-height:1">▲</span></div></td>
-      <td class="td-id ${p.hasBP?'has-bp':''}">${p.hasBP?p.id:'<span style="color:var(--purple);font-family:'DM Mono',monospace;font-size:11px">PRE-BP</span>'}</td>
+      <td class="td-id ${p.hasBP?'has-bp':''}">${p.hasBP?p.id:'<span style="color:var(--purple);font-family:monospace;font-size:11px">PRE-BP</span>'}</td>
       <td><div class="td-name">${p.nombreComercial}</div><div class="td-sub">${p.ciudad}, ${p.departamento}</div></td>
       <td>${p.tipo==='Apertura'?'<span class="badge badge-ap">Apertura</span>':'<span class="badge badge-exp">Expansión</span>'}</td>
       <td><div style="font-size:13px">${p.region}</div><div class="td-sub">${p.zona}</div></td>
       <td><span class="${p.hasBP?'badge badge-etapa':'badge badge-prebp'}">${p.etapa.replace(/^\d+\.?\d*\s/,'')}</span></td>
       <td style="font-size:13px;white-space:nowrap;${dateStyle}">${fmtDate(p.propuestaTiempoDd)}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:13px">${p.pitsProyectados||'—'}</td>
+      <td style="font-family:monospace;font-size:13px">${p.pitsProyectados||'—'}</td>
       <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${p.ejecucion}%"></div></div><span class="progress-pct">${p.ejecucion}%</span></div></td>
       <td style="font-size:13px">${p.responsable}</td>
     </tr>`;
@@ -1038,7 +1038,7 @@ function openDetail(id) {
       <div class="detail-field"><div class="detail-field-label">Región</div><div class="detail-field-value">${p.region}</div></div>
       <div class="detail-field"><div class="detail-field-label">Zona</div><div class="detail-field-value">${p.zona}</div></div>
       ${p.razonSocial?`<div class="detail-field" style="grid-column:1/-1"><div class="detail-field-label">Razón social</div><div class="detail-field-value">${p.razonSocial}</div></div>`:''}
-      ${p.nitSucursal?`<div class="detail-field"><div class="detail-field-label">NIT-Sucursal</div><div class="detail-field-value" style="font-family:'DM Mono',monospace;font-size:12px">${p.nitSucursal}</div></div>`:''}
+      ${p.nitSucursal?`<div class="detail-field"><div class="detail-field-label">NIT-Sucursal</div><div class="detail-field-value" style="font-family:monospace;font-size:12px">${p.nitSucursal}</div></div>`:''}
       ${p.canal?`<div class="detail-field"><div class="detail-field-label">Canal</div><div class="detail-field-value">${p.canal}</div></div>`:''}
       <div class="detail-field"><div class="detail-field-label">Responsable</div><div class="detail-field-value">${p.responsable}</div></div>
       <div class="detail-field"><div class="detail-field-label">Priorización</div><div class="detail-field-value ${!p.tipoPriorizacion?'empty':''}">${p.tipoPriorizacion||'Sin definir'}</div></div>
@@ -1061,8 +1061,8 @@ function openDetail(id) {
     <div class="detail-section"><div class="detail-section-title">Etapa del proyecto</div><div class="etapa-track">${ETAPAS.map((e,i)=>`<div class="etapa-step ${i<etapaIdx?'done':i===etapaIdx?'current':''}"><div class="etapa-dot"></div><span>${e}</span></div>`).join('')}</div></div>
     ${p.comentario?`<div class="detail-section"><div class="detail-section-title">Comentario</div><div style="font-size:13.5px;color:var(--text2);line-height:1.6">${p.comentario}</div></div>`:''}
     ${p.candidatos&&p.candidatos.length>0?`<div class="detail-section"><div class="detail-section-title">Candidatos</div>${p.candidatos.map(c=>`<div class="candidate-card"><div class="candidate-name">${c.nombre}</div><div class="candidate-meta">${c.nit||''} · ${c.estado}</div></div>`).join('')}</div>`:''}
-    ${(p.inversionDd||p.inversionPosventa)?`<div class="detail-section"><div class="detail-section-title">Inversiones</div><div class="detail-grid">${p.inversionDd?`<div class="detail-field"><div class="detail-field-label">Inversión DD</div><div class="detail-field-value" style="font-family:'DM Mono',monospace;font-size:12px">${fmtMoney(p.inversionDd)}</div></div>`:''} ${p.inversionPosventa?`<div class="detail-field"><div class="detail-field-label">Inversión Posventa</div><div class="detail-field-value" style="font-family:'DM Mono',monospace;font-size:12px">${fmtMoney(p.inversionPosventa)}</div></div>`:''}</div></div>`:''}
-    ${p.historial&&p.historial.length>0?`<div class="detail-section"><div class="detail-section-title">Historial de cambios</div><div style="display:flex;flex-direction:column;gap:8px">${p.historial.slice(0,10).map(h=>`<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px"><div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-bottom:6px">${h.fecha}</div>${h.cambios.map(c=>`<div style="font-size:12.5px;color:var(--text2);margin-bottom:3px"><span style="color:var(--text3)">${c.label}:</span> <span style="text-decoration:line-through;color:var(--text3)">${c.from}</span> → <strong>${c.to}</strong></div>`).join('')}</div>`).join('')}</div></div>`:''}
+    ${(p.inversionDd||p.inversionPosventa)?`<div class="detail-section"><div class="detail-section-title">Inversiones</div><div class="detail-grid">${p.inversionDd?`<div class="detail-field"><div class="detail-field-label">Inversión DD</div><div class="detail-field-value" style="font-family:monospace;font-size:12px">${fmtMoney(p.inversionDd)}</div></div>`:''} ${p.inversionPosventa?`<div class="detail-field"><div class="detail-field-label">Inversión Posventa</div><div class="detail-field-value" style="font-family:monospace;font-size:12px">${fmtMoney(p.inversionPosventa)}</div></div>`:''}</div></div>`:''}
+    ${p.historial&&p.historial.length>0?`<div class="detail-section"><div class="detail-section-title">Historial de cambios</div><div style="display:flex;flex-direction:column;gap:8px">${p.historial.slice(0,10).map(h=>`<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px"><div style="font-size:11px;font-family:monospace;color:var(--text3);margin-bottom:6px">${h.fecha}</div>${h.cambios.map(c=>`<div style="font-size:12.5px;color:var(--text2);margin-bottom:3px"><span style="color:var(--text3)">${c.label}:</span> <span style="text-decoration:line-through;color:var(--text3)">${c.from}</span> → <strong>${c.to}</strong></div>`).join('')}</div>`).join('')}</div></div>`:''}
   `;
   document.getElementById('detail-panel').classList.add('open');
 }
@@ -1079,7 +1079,7 @@ function openBPModal(id) {
   document.getElementById('modal-sub').textContent=p.nombreComercial;
   document.getElementById('modal-body').innerHTML=`
     <p style="font-size:13.5px;color:var(--text2);margin-bottom:16px;line-height:1.6">Al aprobar el Business Plan, este proyecto recibirá su ID oficial y será incluido en los reportes de Power BI.</p>
-    <div class="bp-assign-box"><div style="font-size:12px;color:var(--blue);font-family:'DM Mono',monospace;letter-spacing:0.5px;text-transform:uppercase">ID que se asignará</div><div class="bp-assign-id">${newId}</div><div style="font-size:12px;color:var(--blue)">${p.tipo} · ${p.ciudad}</div></div>
+    <div class="bp-assign-box"><div style="font-size:12px;color:var(--blue);font-family:monospace;letter-spacing:0.5px;text-transform:uppercase">ID que se asignará</div><div class="bp-assign-id">${newId}</div><div style="font-size:12px;color:var(--blue)">${p.tipo} · ${p.ciudad}</div></div>
     <div class="form-section" style="margin-top:16px"><div class="form-grid">
       <div class="field"><label>Tamaño <span class="required">*</span></label><select id="bp-tamano"><option value="">Seleccionar...</option>${TAMANIOS.map(t=>`<option>${t}</option>`).join('')}</select><span class="field-error" id="err-bp-tamano">Obligatorio</span></div>
       <div class="field"><label>Tipificación <span class="required">*</span></label><select id="bp-tipif"><option value="">Seleccionar...</option>${TIPIFICACIONES.map(t=>`<option>${t}</option>`).join('')}</select><span class="field-error" id="err-bp-tipif">Obligatorio</span></div>
