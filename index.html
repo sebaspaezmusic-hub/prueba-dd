@@ -349,7 +349,7 @@ const SP_CONFIG = {
   candidatesListName: 'CandidatosRedDD',
   graphBase: 'https://graph.microsoft.com/v1.0'
 };
-const SP_SCOPES = ['https://kumo2.sharepoint.com/AllSites.ReadWrite'];
+const SP_SCOPES = ['https://graph.microsoft.com/Sites.ReadWrite.All', 'https://graph.microsoft.com/Files.ReadWrite.All'];
 
 // These are set after MSAL loads
 let msalInstance = null;
