@@ -337,7 +337,7 @@ function msalLoadError() {
   document.getElementById('sign-in-btn').textContent = 'Iniciar sesión con Microsoft';
 }
 </script>
-<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js" onload="appInit()" onerror="msalLoadError()"></script>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <script>
 // ══════════════════════════════════════════════════════
 // CONFIG
@@ -374,7 +374,7 @@ let modalMode = 'create';
 let editCandidatos = [];
 
 // ══════════════════════════════════════════════════════
-// MSAL INIT — called by onload
+// MSAL INIT
 // ══════════════════════════════════════════════════════
 function msalLoadError() {
   document.getElementById('auth-error').style.display = 'block';
@@ -392,9 +392,6 @@ async function appInit() {
     },
     cache: { cacheLocation: 'sessionStorage', storeAuthStateInCookie: false }
   });
-
-  // Wire up sign-in button now that MSAL is ready
-  document.getElementById('sign-in-btn').onclick = signIn;
 
   try {
     await msalInstance.initialize();
@@ -1222,6 +1219,33 @@ function showToast(msg, type) {
   clearTimeout(t._timer);
   t._timer = setTimeout(function(){t.classList.remove('show');}, 3500);
 }
+
+// Wait for MSAL to be available, then initialize
+function waitForMsal(retries) {
+  if (typeof msal !== 'undefined') {
+    appInit();
+  } else if (retries > 0) {
+    setTimeout(function() { waitForMsal(retries - 1); }, 100);
+  } else {
+    document.getElementById('auth-error').style.display = 'block';
+    document.getElementById('auth-error').textContent = 'No se pudo cargar la librería de autenticación. Verifica tu conexión e intenta de nuevo.';
+    document.getElementById('sign-in-btn').disabled = false;
+    document.getElementById('sign-in-btn').onclick = function() {
+      document.getElementById('auth-error').textContent = 'Recarga la página e intenta de nuevo.';
+    };
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Wire up sign-in button immediately so it shows feedback
+  document.getElementById('sign-in-btn').onclick = function() {
+    document.getElementById('sign-in-btn').disabled = true;
+    document.getElementById('sign-in-btn').textContent = 'Cargando...';
+    waitForMsal(20);
+  };
+  // Start waiting for MSAL
+  waitForMsal(50);
+});
 </script>
 </body>
 </html>
