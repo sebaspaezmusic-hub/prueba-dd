@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Honda Colombia — Plan de Red DD</title>
-<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<script src="https://unpkg.com/@azure/msal-browser@2.38.0/dist/msal-browser.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1391,10 +1391,27 @@ function showToast(msg,type) {
 // ══════════════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════════════
-populateFilters();
-renderTable();
-updateCounts();
-initAuth();
+document.addEventListener('DOMContentLoaded', function() {
+  populateFilters();
+  renderTable();
+  updateCounts();
+  // Wait for MSAL to be available
+  if (typeof msal !== 'undefined') {
+    initAuth();
+  } else {
+    // MSAL not loaded yet, wait
+    const msalScript = document.querySelector('script[src*="msal"]');
+    if (msalScript) {
+      msalScript.addEventListener('load', initAuth);
+      msalScript.addEventListener('error', function() {
+        document.getElementById('auth-error').style.display = 'block';
+        document.getElementById('auth-error').textContent = 'Error cargando la librería de autenticación. Verifica tu conexión a internet.';
+        document.getElementById('sign-in-btn').disabled = false;
+        document.getElementById('sign-in-btn').textContent = 'Iniciar sesión con Microsoft';
+      });
+    }
+  }
+});
 </script>
 </body>
 </html>
