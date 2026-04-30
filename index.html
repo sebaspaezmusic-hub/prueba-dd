@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Honda Colombia — Plan de Red DD</title>
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red:#CC0000;--red-dark:#990000;--red-soft:#FDEAEA;--red-mid:#F5C0C0;
+  --bg:#F7F6F3;--surface:#FFFFFF;--surface2:#F2F1EE;--border:#E4E2DC;
+  --text:#1A1916;--text2:#5C5A54;--text3:#9C9A94;
+  --green:#1A6E3C;--green-bg:#E8F5EE;
+  --amber:#8A5A00;--amber-bg:#FDF3DC;
+  --orange:#B84E00;--orange-bg:#FEF0E6;
+  --blue:#1A3A6E;--blue-bg:#E8EEFA;
+  --purple:#5B1A8A;--purple-bg:#F3EAFD;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
+
+
+/* AUTH */
+.auth-overlay{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:48px 40px;text-align:center;max-width:400px;width:100%;box-shadow:var(--shadow-md);}
+.auth-logo{width:48px;height:48px;background:var(--red);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px;margin:0 auto 20px;}
+.auth-title{font-size:20px;font-weight:600;letter-spacing:-0.3px;margin-bottom:8px;}
+.auth-sub{font-size:13.5px;color:var(--text3);margin-bottom:28px;line-height:1.6;}
+.auth-btn{width:100%;padding:12px;background:var(--red);color:white;border:none;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.15s;}
+.auth-btn:hover{background:var(--red-dark);}
+.auth-btn:disabled{background:var(--text3);cursor:not-allowed;}
+.auth-user{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius-sm);background:var(--surface2);cursor:pointer;transition:background 0.15s;}
+.auth-user:hover{background:var(--border);}
+.auth-avatar{width:28px;height:28px;border-radius:50%;background:var(--red);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+.auth-name{font-size:13px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sync-indicator{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.sync-dot.loading{background:var(--amber);animation:pulse 1s infinite;}
+.sync-dot.error{background:var(--red);}
+
+/* HEADER */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-mark{width:32px;height:32px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;color:white;font-weight:600;font-size:13px;}
+.logo-text{font-size:14px;font-weight:500;letter-spacing:-0.2px;}
+.logo-sub{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.5px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+
+/* LAYOUT */
+.app-layout{display:flex;height:calc(100vh - 56px);}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:20px 0;flex-shrink:0;overflow-y:auto;}
+.nav-section{padding:0 12px;margin-bottom:4px;}
+.nav-label{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--text3);padding:0 8px;margin-bottom:6px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:13.5px;transition:all 0.15s;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:var(--red-soft);color:var(--red);font-weight:500;}
+.nav-icon{width:16px;height:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;opacity:0.7;}
+.nav-item.active .nav-icon{opacity:1;}
+.nav-count{margin-left:auto;font-size:11px;font-family:'DM Mono',monospace;background:var(--surface2);padding:1px 6px;border-radius:10px;color:var(--text3);}
+.nav-item.active .nav-count{background:var(--red-mid);color:var(--red-dark);}
+.alert-dot{width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:auto;flex-shrink:0;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:28px 32px;}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-0.5px;line-height:1.2;}
+.page-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;white-space:nowrap;}
+.btn-primary{background:var(--red);color:white;}
+.btn-primary:hover{background:var(--red-dark);}
+.btn-secondary{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--surface2);color:var(--text);}
+.btn-ghost{background:transparent;color:var(--text3);padding:6px 10px;}
+.btn-ghost:hover{background:var(--surface2);color:var(--text);}
+.btn-warning{background:#FFF3E0;color:var(--orange);border:1px solid #FFCC80;}
+.btn-warning:hover{background:#FFE0B2;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;}
+.stat-label{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;margin-bottom:6px;}
+.stat-value{font-size:26px;font-weight:600;letter-spacing:-1px;color:var(--text);line-height:1;}
+.stat-meta{font-size:12px;color:var(--text3);margin-top:4px;}
+
+/* FILTERS */
+.filters{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.filter-input{flex:1;min-width:200px;max-width:280px;padding:7px 12px 7px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s;}
+.filter-input:focus{border-color:var(--red);}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;}
+.filter-select{padding:7px 28px 7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text2);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239C9A94'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.15s;}
+.filter-select:focus{border-color:var(--red);}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:10px 16px;text-align:left;font-size:11px;font-family:'DM Mono',monospace;letter-spacing:0.5px;color:var(--text3);text-transform:uppercase;background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;font-weight:500;user-select:none;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;cursor:pointer;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--bg);}
+tbody tr.selected{background:var(--red-soft);}
+td{padding:12px 16px;font-size:13.5px;vertical-align:middle;}
+.td-id{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3);white-space:nowrap;}
+.td-id.has-bp{color:var(--blue);font-weight:500;}
+.td-name{font-weight:500;}
+.td-sub{font-size:12px;color:var(--text3);margin-top:1px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:11.5px;font-weight:500;white-space:nowrap;}
+.badge-ap{background:var(--blue-bg);color:var(--blue);}
+.badge-exp{background:var(--amber-bg);color:var(--amber);}
+.badge-etapa{background:var(--surface2);color:var(--text2);font-size:11px;font-family:'DM Mono',monospace;}
+.badge-prebp{background:var(--purple-bg);color:var(--purple);font-size:11px;font-family:'DM Mono',monospace;}
+.badge-working{background:var(--green-bg);color:var(--green);}
+.badge-no{background:#F5F5F5;color:var(--text3);}
+
+/* PROGRESS */
+.progress-wrap{display:flex;align-items:center;gap:8px;}
+.progress-bar{flex:1;height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;min-width:60px;}
+.progress-fill{height:100%;background:var(--red);border-radius:2px;}
+.progress-pct{font-size:12px;font-family:'DM Mono',monospace;color:var(--text3);white-space:nowrap;min-width:32px;}
+
+/* ALERTS PAGE */
+.alerts-grid{display:flex;flex-direction:column;gap:16px;}
+.alert-group{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+.alert-group-header{padding:14px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.alert-group-title{font-size:14px;font-weight:600;}
+.alert-group-sub{font-size:12px;color:var(--text3);margin-left:auto;}
+.alert-severity{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sev-critical{background:#C62828;}
+.sev-high{background:var(--orange);}
+.sev-medium{background:#EFB400;}
+.sev-stale{background:var(--text3);}
+.alert-row{padding:12px 20px;display:grid;grid-template-columns:1fr auto auto auto;gap:16px;align-items:center;border-bottom:1px solid var(--border);transition:background 0.1s;cursor:pointer;}
+.alert-row:last-child{border-bottom:none;}
+.alert-row:hover{background:var(--bg);}
+.alert-name{font-weight:500;font-size:13.5px;}
+.alert-meta{font-size:12px;color:var(--text3);margin-top:1px;}
+.alert-chip{padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:500;white-space:nowrap;}
+.chip-critical{background:#FDEAEA;color:#C62828;}
+.chip-high{background:var(--orange-bg);color:var(--orange);}
+.chip-medium{background:#FFFDE7;color:#8A6A00;}
+.chip-stale{background:var(--surface2);color:var(--text3);}
+.alert-date{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);white-space:nowrap;}
+.alert-empty{padding:32px 20px;text-align:center;color:var(--text3);font-size:13px;}
+
+/* DETAIL PANEL */
+.detail-panel{display:none;position:fixed;right:0;top:56px;bottom:0;width:480px;background:var(--surface);border-left:1px solid var(--border);z-index:90;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,0.06);animation:slideIn 0.2s ease;}
+@keyframes slideIn{from{transform:translateX(30px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.detail-panel.open{display:block;}
+.detail-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;}
+.detail-id{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:4px;}
+.detail-title{font-size:16px;font-weight:600;letter-spacing:-0.3px;margin-bottom:8px;}
+.detail-body{padding:20px 24px;}
+.detail-section{margin-bottom:24px;}
+.detail-section-title{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:12px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.detail-field{display:flex;flex-direction:column;gap:2px;}
+.detail-field-label{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;}
+.detail-field-value{font-size:13.5px;color:var(--text);font-weight:500;}
+.detail-field-value.empty{color:var(--text3);font-weight:400;font-style:italic;}
+.etapa-track{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
+.etapa-step{display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:var(--radius-sm);background:var(--surface2);font-size:13px;color:var(--text3);}
+.etapa-step.done{background:var(--green-bg);color:var(--green);}
+.etapa-step.current{background:var(--red-soft);color:var(--red);font-weight:500;}
+.etapa-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
+.etapa-step.done .etapa-dot{background:var(--green);}
+.etapa-step.current .etapa-dot{background:var(--red);}
+.pits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.pit-cell{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;text-align:center;}
+.pit-cell-label{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;}
+.pit-cell-value{font-size:20px;font-weight:600;letter-spacing:-0.5px;color:var(--text);}
+.pit-cell.diff .pit-cell-value{color:var(--green);}
+.pit-cell.diff .pit-cell-value.negative{color:#C62828;}
+.candidate-card{padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;}
+.candidate-name{font-weight:500;font-size:13.5px;margin-bottom:2px;}
+.candidate-meta{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
+
+/* BP NOTICE */
+.bp-notice{background:var(--blue-bg);border:1px solid #C5D8F8;border-radius:var(--radius-sm);padding:12px 16px;display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;}
+.bp-notice-text{font-size:13px;color:var(--blue);flex:1;}
+.bp-notice-text strong{font-weight:600;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:14px;width:100%;max-width:740px;box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:modalIn 0.2s ease;margin:auto;}
+@keyframes modalIn{from{opacity:0;transform:translateY(-12px) scale(0.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.modal-header{padding:24px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;}
+.modal-title{font-size:17px;font-weight:600;letter-spacing:-0.3px;}
+.modal-sub{font-size:12px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace;}
+.modal-body{padding:24px 28px;max-height:65vh;overflow-y:auto;}
+.modal-footer{padding:16px 28px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.modal-footer-right{display:flex;gap:8px;}
+
+/* FORM */
+.form-section{margin-bottom:24px;}
+.form-section-title{font-size:11px;font-family:'DM Mono',monospace;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.form-full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:12px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:4px;}
+.required{color:var(--red);font-size:13px;line-height:1;}
+.req-etapa{color:var(--orange);font-size:10px;font-family:'DM Mono',monospace;font-weight:400;background:var(--orange-bg);padding:1px 6px;border-radius:3px;}
+.optional-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);font-weight:400;}
+.field input,.field select,.field textarea{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13.5px;background:var(--surface);color:var(--text);outline:none;transition:border-color 0.15s,box-shadow 0.15s;width:100%;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(204,0,0,0.08);}
+.field input.error,.field select.error{border-color:#E53935;background:#FFF8F8;}
+.field-error{font-size:11.5px;color:#E53935;display:none;}
+.field-error.show{display:block;}
+.field input:disabled,.field select:disabled{background:var(--surface2);color:var(--text3);cursor:not-allowed;}
+.field textarea{resize:vertical;min-height:72px;}
+.id-preview{padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface2);font-family:'DM Mono',monospace;font-size:13px;color:var(--text3);letter-spacing:0.5px;}
+.date-highlight{border-color:var(--orange) !important;background:#FFFBF5 !important;}
+.date-highlight:focus{border-color:var(--red) !important;}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab{padding:10px 16px;font-size:13.5px;cursor:pointer;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--red);border-bottom-color:var(--red);font-weight:500;}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--red);color:white;font-size:10px;font-weight:600;margin-left:4px;}
+
+/* WARN BANNER */
+.warn-banner{background:#FFF3E0;border:1px solid #FFCC80;border-radius:var(--radius-sm);padding:10px 14px;font-size:13px;color:var(--orange);margin-bottom:16px;display:flex;align-items:flex-start;gap:8px;}
+.warn-banner ul{margin-left:16px;margin-top:4px;}
+
+/* CONFIRM MODAL */
+.confirm-modal{background:var(--surface);border-radius:14px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:modalIn 0.2s ease;margin:auto;padding:28px;}
+.confirm-title{font-size:16px;font-weight:600;margin-bottom:8px;}
+.confirm-body{font-size:13.5px;color:var(--text2);margin-bottom:20px;line-height:1.6;}
+.confirm-actions{display:flex;gap:8px;justify-content:flex-end;}
+
+/* BP MODAL */
+.bp-assign-box{background:var(--blue-bg);border:1px solid #C5D8F8;border-radius:var(--radius);padding:20px;text-align:center;margin:16px 0;}
+.bp-assign-id{font-family:'DM Mono',monospace;font-size:28px;font-weight:600;color:var(--blue);letter-spacing:1px;margin:8px 0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:12px 18px;border-radius:var(--radius);font-size:13.5px;font-weight:500;box-shadow:var(--shadow-md);z-index:300;display:none;align-items:center;gap:8px;animation:toastIn 0.2s ease;max-width:360px;}
+.toast.show{display:flex;}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.toast-success{background:var(--green);}
+.toast-error{background:#C62828;}
+.toast-info{background:var(--blue);}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:0.4;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-mark">H</div>
+    <div>
+      <div class="logo-text">Honda Colombia</div>
+      <div class="logo-sub">DEALER DEVELOPMENT · RED DD</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-indicator" id="sync-indicator">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-text">Conectando...</span>
+    </div>
+    <button class="btn btn-secondary" onclick="syncFromSharePoint()" id="btn-sync" style="display:none">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13.5 2.5A6.5 6.5 0 0 0 2 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M2.5 13.5A6.5 6.5 0 0 0 14 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M1 5l1.5 2.5 2.5-1.5M15 11l-1.5-2.5-2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Sincronizar
+    </button>
+    <div class="auth-user" id="auth-user-btn" style="display:none" onclick="signOut()">
+      <div class="auth-avatar" id="auth-avatar">?</div>
+      <span class="auth-name" id="auth-name">Usuario</span>
+    </div>
+  </div>
+</header>
+
+<div class="app-layout">
+<nav class="sidebar">
+  <div class="nav-section">
+    <div class="nav-label">Vistas</div>
+    <div class="nav-item active" id="nav-proyectos" onclick="setView('proyectos',this)">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.4"/></svg></span>
+      Proyectos
+      <span class="nav-count" id="count-total">0</span>
+    </div>
+    <div class="nav-item" id="nav-aperturas" onclick="setView('aperturas',this)">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+      Aperturas
+      <span class="nav-count" id="count-ap">0</span>
+    </div>
+    <div class="nav-item" id="nav-expansiones" onclick="setView('expansiones',this)">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 13L13 3M13 3H7M13 3v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      Expansiones
+      <span class="nav-count" id="count-exp">0</span>
+    </div>
+  </div>
+  <div class="nav-section" style="margin-top:16px">
+    <div class="nav-label">Estado</div>
+    <div class="nav-item" id="nav-activos" onclick="setView('activos',this)">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      En curso
+      <span class="nav-count" id="count-activos">0</span>
+    </div>
+    <div class="nav-item" id="nav-operando" onclick="setView('operando',this)">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      Operando
+      <span class="nav-count" id="count-op">0</span>
+    </div>
+  </div>
+  <div class="nav-section" style="margin-top:16px">
+    <div class="nav-label">Seguimiento</div>
+    <div class="nav-item" id="nav-alertas" onclick="setView('alertas',this)">
+      <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a5 5 0 0 1 5 5c0 3 1 4 1.5 4.5H1.5C2 11 3 10 3 7a5 5 0 0 1 5-5zM6.5 13.5a1.5 1.5 0 0 0 3 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      Alertas
+      <span class="alert-dot" id="alert-dot" style="display:none"></span>
+      <span class="nav-count" id="count-alertas">0</span>
+    </div>
+  </div>
+</nav>
+
+<main class="main" id="main-content">
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-label">Total proyectos</div><div class="stat-value" id="stat-total">0</div><div class="stat-meta">en el plan</div></div>
+    <div class="stat-card"><div class="stat-label">Aperturas</div><div class="stat-value" id="stat-ap">0</div><div class="stat-meta">nuevos puntos</div></div>
+    <div class="stat-card"><div class="stat-label">Expansiones</div><div class="stat-value" id="stat-exp">0</div><div class="stat-meta">puntos existentes</div></div>
+    <div class="stat-card"><div class="stat-label">Próx. apertura</div><div class="stat-value" id="stat-next" style="font-size:16px;letter-spacing:-0.3px">—</div><div class="stat-meta" id="stat-next-name">sin datos</div></div>
+  </div>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div><div class="page-title" id="view-title">Todos los proyectos</div><div class="page-sub" id="view-sub">Plan de expansión y aperturas de red DD</div></div>
+    <button class="btn btn-primary" id="btn-nuevo" onclick="openModal('create')">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      Nuevo proyecto
+    </button>
+  </div>
+
+  <!-- Filters (hidden in alerts view) -->
+  <div id="filters-bar" class="filters">
+    <div class="search-wrap">
+      <svg class="search-icon" width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input class="filter-input" type="text" placeholder="Buscar proyecto..." id="search-input" oninput="renderTable()">
+    </div>
+    <select class="filter-select" id="filter-region" onchange="renderTable()">
+      <option value="">Todas las regiones</option>
+      <option>R1</option><option>R2</option><option>R3</option>
+    </select>
+    <select class="filter-select" id="filter-etapa" onchange="renderTable()">
+      <option value="">Todas las etapas</option>
+    </select>
+    <select class="filter-select" id="filter-responsable" onchange="renderTable()">
+      <option value="">Todos los responsables</option>
+    </select>
+  </div>
+
+  <!-- Table view -->
+  <div id="table-view">
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th></th><th>ID</th><th>Proyecto</th><th>Categoría</th><th>Región / Zona</th>
+          <th>Etapa</th><th>Inicio oper. est.</th><th>Pits proy.</th><th>% Ejec.</th><th>Responsable</th>
+        </tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+      <div class="empty-state" id="empty-state" style="display:none"><div class="empty-icon">◯</div><div>No hay proyectos que coincidan</div></div>
+    </div>
+  </div>
+
+  <!-- Alerts view -->
+  <div id="alerts-view" style="display:none"></div>
+</main>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-panel" id="detail-panel">
+  <div class="detail-header">
+    <div>
+      <div class="detail-id" id="dp-id"></div>
+      <div class="detail-title" id="dp-title"></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px" id="dp-badges"></div>
+    </div>
+    <div style="display:flex;gap:4px;margin-top:4px">
+      <button class="btn btn-secondary" onclick="openModal('edit',selectedId)" style="font-size:12px;padding:6px 12px">Editar</button>
+      <button class="btn btn-ghost" onclick="closeDetail()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="detail-body" id="detail-body"></div>
+</div>
+
+<!-- MAIN MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div><div class="modal-title" id="modal-title">Nuevo proyecto</div><div class="modal-sub" id="modal-sub">Complete los campos requeridos</div></div>
+      <button class="btn btn-ghost" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <div id="modal-footer-left"></div>
+      <div class="modal-footer-right">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" id="modal-submit" onclick="handleSubmit()">Crear proyecto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-overlay">
+  <div class="confirm-modal">
+    <div class="confirm-title" id="confirm-title">¿Está seguro?</div>
+    <div class="confirm-body" id="confirm-body"></div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="document.getElementById('confirm-overlay').style.display='none'">Cancelar</button>
+      <button class="btn btn-primary" id="confirm-ok" style="background:#E53935">Confirmar de todas formas</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo">H</div>
+    <div class="auth-title">Honda Colombia — Red DD</div>
+    <div class="auth-sub">Inicia sesión con tu cuenta corporativa Kumo2 para acceder al plan de aperturas y expansiones.</div>
+    <button class="auth-btn" id="sign-in-btn" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 21 21" fill="none"><path d="M10 1H1v9h9V1zM20 1h-9v9h9V1zM10 11H1v9h9v-9zM20 11h-9v9h9v-9z" fill="currentColor" opacity=".6"/></svg>
+      Iniciar sesión con Microsoft
+    </button>
+    <div id="auth-error" style="margin-top:14px;font-size:12.5px;color:#C62828;display:none"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════
+const SP_CONFIG = {
+  clientId: '097cce92-244a-43ea-a4c8-b78e7614619d',
+  tenantId: 'common',
+  siteUrl: 'https://kumo2.sharepoint.com/sites/DealerDevelopment',
+  listName: 'PlanRedDD',
+  candidatesListName: 'CandidatosRedDD',
+  graphBase: 'https://graph.microsoft.com/v1.0'
+};
+
+const msalConfig = {
+  auth: {
+    clientId: SP_CONFIG.clientId,
+    authority: 'https://login.microsoftonline.com/common',
+    redirectUri: window.location.href.split('?')[0]
+  },
+  cache: { cacheLocation: 'sessionStorage' }
+};
+
+const msalInstance = new msal.PublicClientApplication(msalConfig);
+const SP_SCOPES = ['https://kumo2.sharepoint.com/AllSites.ReadWrite'];
+let currentAccount = null;
+let siteId = null;
+let listId = null;
+let candidatesListId = null;
+
+// ══════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════
+const ETAPAS = ['1. Análisis BP','2. Verificación local','3.1 Selección de Candidato','3.2 Alineación candidato','4. Definición Layout','5. Diseño PDV','6. Desarrollo proyecto','7. Entrega a Comercial','8. Operando'];
+const RESPONSABLES = ['Analítica DD','Comercial','Infraestructura DD'];
+const TAMANIOS = ['Nano','Micro','Standard','Macro','Mega','Giga','Flagship'];
+const TIPIFICACIONES = ['3S','2S','1S'];
+const REGIONES_ZONAS = { 'R1':['Z01','Z02','Z03','Z04'], 'R2':['Z05','Z06','Z07','Z08'], 'R3':['Z09','Z10','Z11'] };
+const COL_DPTOS = {
+  'Amazonas':['Leticia','Puerto Nariño'],'Antioquia':['Medellín','Bello','Itagüí','Envigado','Apartadó','Turbo','Rionegro','Caucasia','Sabaneta'],
+  'Arauca':['Arauca','Saravena','Tame'],'Atlántico':['Barranquilla','Soledad','Malambo','Sabanalarga'],
+  'Bogotá D.C.':['Bogotá'],'Bolívar':['Cartagena','Magangué','El Carmen de Bolívar'],
+  'Boyacá':['Tunja','Duitama','Sogamoso','Chiquinquirá'],'Caldas':['Manizales','Villamaría','La Dorada','Chinchiná'],
+  'Caquetá':['Florencia','San Vicente del Caguán'],'Casanare':['Yopal','Aguazul','Villanueva'],
+  'Cauca':['Popayán','Santander de Quilichao','Puerto Tejada'],'Cesar':['Valledupar','Aguachica','Codazzi'],
+  'Chocó':['Quibdó','Istmina','Riosucio'],'Córdoba':['Montería','Cereté','Lorica','Sahagún'],
+  'Cundinamarca':['Soacha','Fusagasugá','Facatativá','Zipaquirá','Chía','Mosquera','Madrid','Funza'],
+  'Guainía':['Inírida'],'Guaviare':['San José del Guaviare'],
+  'Huila':['Neiva','Pitalito','Garzón','La Plata'],'La Guajira':['Riohacha','Maicao','Uribia'],
+  'Magdalena':['Santa Marta','Ciénaga','Fundación'],'Meta':['Villavicencio','Acacías','Granada','Puerto López'],
+  'Nariño':['Pasto','Ipiales','Tumaco','Túquerres'],'Norte de Santander':['Cúcuta','Ocaña','Pamplona','Villa del Rosario'],
+  'Putumayo':['Mocoa','Puerto Asís','Orito'],'Quindío':['Armenia','Calarcá','Montenegro','Quimbaya'],
+  'Risaralda':['Pereira','Dosquebradas','Santa Rosa de Cabal'],
+  'San Andrés y Providencia':['San Andrés'],'Santander':['Bucaramanga','Floridablanca','Girón','Piedecuesta','Barrancabermeja'],
+  'Sucre':['Sincelejo','Corozal'],'Tolima':['Ibagué','Espinal','Melgar','Honda'],
+  'Valle del Cauca':['Cali','Buenaventura','Palmira','Buga','Tulúa','Cartago','Jamundí','Yumbo'],
+  'Vaupés':['Mitú'],'Vichada':['Puerto Carreño']
+};
+const STAGE_REQUIRED = {
+  '1. Análisis BP':{ fields:[], note:'Al avanzar a etapa 2 serán obligatorios: Tamaño, Pits teóricos, Tipificación.' },
+  '2. Verificación local':{ fields:['e-pits-teo','e-tamano','e-tipif'], advanceReq:['e-pits-teo','e-tamano','e-tipif'], note:'Avanzar a etapa 3 requiere: Metros cuadrados.' },
+  '3.1 Selección de Candidato':{ fields:['e-m2'], advanceReq:['e-m2'], note:'Avanzar a 3.2 requiere al menos un candidato registrado y Canal.' },
+  '3.2 Alineación candidato':{ fields:['e-canal'], advanceReq:['e-canal'], note:'Avanzar a etapa 4 requiere candidatos y Canal.' },
+  '4. Definición Layout':{ fields:['e-pits-def','e-pits-ini','e-pits-proy'], advanceReq:['e-pits-def','e-pits-ini','e-pits-proy'], note:'' },
+  '5. Diseño PDV':{ fields:[], advanceReq:[], note:'' },
+  '6. Desarrollo proyecto':{ fields:[], advanceReq:[], note:'' },
+  '7. Entrega a Comercial':{ fields:[], advanceReq:[], note:'' },
+  '8. Operando':{ fields:['e-fecha'], advanceReq:['e-fecha'], note:'NIT-Sucursal obligatorio para aperturas al marcar como Operando.' }
+};
+
+// ══════════════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════════════
+async function initAuth() {
+  try {
+    await msalInstance.initialize();
+    const response = await msalInstance.handleRedirectPromise();
+    if (response) { currentAccount = response.account; }
+    else {
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) currentAccount = accounts[0];
+    }
+    if (currentAccount) { await onSignedIn(); }
+    else { showAuthOverlay(); }
+  } catch(e) { showAuthOverlay(); }
+}
+
+function showAuthOverlay() {
+  document.getElementById('auth-overlay').style.display = 'flex';
+  setSyncStatus('idle', '');
+}
+
+async function signIn() {
+  const btn = document.getElementById('sign-in-btn');
+  btn.disabled = true; btn.textContent = 'Iniciando sesión...';
+  try {
+    const result = await msalInstance.loginPopup({ scopes: SP_SCOPES });
+    currentAccount = result.account;
+    await onSignedIn();
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'Iniciar sesión con Microsoft';
+    const errEl = document.getElementById('auth-error');
+    errEl.style.display = 'block';
+    errEl.textContent = 'Error al iniciar sesión. Verifica que estás usando tu cuenta corporativa.';
+  }
+}
+
+async function onSignedIn() {
+  document.getElementById('auth-overlay').style.display = 'none';
+  const name = currentAccount.name || currentAccount.username;
+  const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('auth-avatar').textContent = initials;
+  document.getElementById('auth-name').textContent = name.split(' ')[0];
+  document.getElementById('auth-user-btn').style.display = 'flex';
+  document.getElementById('btn-sync').style.display = 'inline-flex';
+  setSyncStatus('loading', 'Conectando a SharePoint...');
+  await resolveListIds();
+  await syncFromSharePoint();
+}
+
+function signOut() {
+  if (!confirm('¿Cerrar sesión?')) return;
+  msalInstance.logoutPopup({ account: currentAccount });
+  currentAccount = null;
+  showAuthOverlay();
+  document.getElementById('auth-user-btn').style.display = 'none';
+  document.getElementById('btn-sync').style.display = 'none';
+}
+
+async function getToken() {
+  try {
+    const result = await msalInstance.acquireTokenSilent({ scopes: SP_SCOPES, account: currentAccount });
+    return result.accessToken;
+  } catch(e) {
+    const result = await msalInstance.acquireTokenPopup({ scopes: SP_SCOPES });
+    return result.accessToken;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// SHAREPOINT API
+// ══════════════════════════════════════════════════════
+async function spGet(url) {
+  const token = await getToken();
+  const res = await fetch(url, { headers: { Authorization: 'Bearer ' + token, Accept: 'application/json' } });
+  if (!res.ok) throw new Error('SP Error: ' + res.status + ' ' + url);
+  return res.json();
+}
+
+async function spPost(url, body) {
+  const token = await getToken();
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error('SP Post Error: ' + res.status + ' ' + t); }
+  return res.json();
+}
+
+async function spPatch(url, body) {
+  const token = await getToken();
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) { const t = await res.text(); throw new Error('SP Patch Error: ' + res.status + ' ' + t); }
+}
+
+async function resolveListIds() {
+  try {
+    const hostname = 'kumo2.sharepoint.com';
+    const sitePath = '/sites/DealerDevelopment';
+    const siteData = await spGet(`${SP_CONFIG.graphBase}/sites/${hostname}:${sitePath}`);
+    siteId = siteData.id;
+    const listsData = await spGet(`${SP_CONFIG.graphBase}/sites/${siteId}/lists?$select=id,name`);
+    for (const l of listsData.value) {
+      if (l.name === SP_CONFIG.listName) listId = l.id;
+      if (l.name === SP_CONFIG.candidatesListName) candidatesListId = l.id;
+    }
+    if (!listId) throw new Error('Lista PlanRedDD no encontrada');
+  } catch(e) {
+    setSyncStatus('error', 'Error al conectar');
+    showToast('Error conectando a SharePoint: ' + e.message, 'error');
+    throw e;
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// FIELD MAPPING
+// ══════════════════════════════════════════════════════
+function spToApp(item) {
+  const f = item.fields || item;
+  return {
+    id: f['ID_x0020_Proyecto'] || f['ID Proyecto'] || ('PRE' + item.id),
+    spId: item.id,
+    hasBP: (f['HasBP'] || 'false') === 'true',
+    tipo: f['Categor_x00ed_a'] || f['Categoría'] || 'Apertura',
+    region: f['Region_x0020_comercial'] || f['Region comercial'] || '',
+    zona: f['Zona_x0020_Comercial'] || f['Zona Comercial'] || '',
+    nombreComercial: f['Nombre_x0020_comercial'] || f['Nombre comercial'] || f.Title || '',
+    razonSocial: f['RAZON_x0020_SOCIAL_x0020_SUCURSAL'] || f['RAZON SOCIAL SUCURSAL'] || '',
+    departamento: f['DEPARTAMENTO'] || '',
+    ciudad: f['CIUDAD'] || '',
+    categoria: f['Categor_x00ed_a'] || f['Categoría'] || '',
+    tipoPriorizacion: f['Tipo_x0020_de_x0020_priorizaci_x'] || f['Tipo de priorización'] || '',
+    inicioProyecto: f['Inicio_x0020_proyecto_x0020_DD'] || f['Inicio proyecto DD'] || '',
+    tamano: f['Tama_x00f1_o'] || f['Tamaño'] || '',
+    etapa: f['Etapa'] || ETAPAS[0],
+    propuestaTiempoDd: f['Propuesta_x0020_tiempo_x0020_DD'] || f['Propuesta tiempo DD'] || '',
+    responsable: f['Responsable'] || '',
+    comentario: f['Comentario'] || '',
+    ejecucion: parseInt(f['_x0025__x0020_Ejecuci_x00f3_n'] || f['% Ejecución']) || 0,
+    nitSucursal: f['NIT_x002d_SUCURSAL'] || f['NIT-SUCURSAL'] || '',
+    canal: f['Canal'] || '',
+    inversionDd: String(f['Inversi_x00f3_n_x0020_DD'] || f['Inversión DD'] || ''),
+    inversionPosventa: String(f['Inversi_x00f3_n_x0020_Posventa'] || f['Inversión Posventa'] || ''),
+    inversionPosvMercadeo: String(f['Inversi_x00f3_n_x0020_posventa_x'] || f['Inversión posventa mercadeo'] || ''),
+    inversionMercadeo: String(f['Inversi_x00f3_n_x0020_mercadeo'] || f['Inversión mercadeo'] || ''),
+    pitsActuales: parseInt(f['Pits_x0020_actuales'] || f['Pits actuales']) || 0,
+    pitsProyectados: parseInt(f['Pits_x0020_proyectados'] || f['Pits proyectados']) || 0,
+    pitsTeóricos: parseInt(f['Pits_x0020_te_x00f3_ricos'] || f['Pits teóricos']) || 0,
+    pitsDefinidos: parseInt(f['Pits_x0020_definidos'] || f['Pits definidos']) || 0,
+    pitsIniciales: parseInt(f['Pits_x0020_iniciales'] || f['Pits iniciales']) || 0,
+    metrosCuadrados: parseInt(f['Metros_x0020_cuadrados'] || f['Metros cuadrados']) || 0,
+    trabajar: f['Trabajar'] || 'Si',
+    tipificacion: f['Tipificaci_x00f3_n'] || f['Tipificación'] || '',
+    ultimaActualizacion: (f['Ultima_x0020_actualizaci_x00f3_n'] || f['Ultima actualización'] || '').split('T')[0],
+    historial: []
+  };
+}
+
+function appToSp(p) {
+  return {
+    'ID Proyecto': p.id,
+    'HasBP': String(p.hasBP),
+    'Title': p.nombreComercial,
+    'Nombre comercial': p.nombreComercial,
+    'RAZON SOCIAL SUCURSAL': p.razonSocial,
+    'DEPARTAMENTO': p.departamento,
+    'CIUDAD': p.ciudad,
+    'Categoría': p.categoria,
+    'Region comercial': p.region,
+    'Zona Comercial': p.zona,
+    'Tipo de priorización': p.tipoPriorizacion,
+    'Inicio proyecto DD': p.inicioProyecto || null,
+    'Tamaño': p.tamano,
+    'Etapa': p.etapa,
+    'Propuesta tiempo DD': p.propuestaTiempoDd || null,
+    'Responsable': p.responsable,
+    'Comentario': p.comentario,
+    '% Ejecución': p.ejecucion,
+    'NIT-SUCURSAL': p.nitSucursal,
+    'Canal': p.canal,
+    'Inversión DD': parseFloat(p.inversionDd) || null,
+    'Inversión Posventa': parseFloat(p.inversionPosventa) || null,
+    'Inversión posventa mercadeo': parseFloat(p.inversionPosvMercadeo) || null,
+    'Inversión mercadeo': parseFloat(p.inversionMercadeo) || null,
+    'Pits actuales': p.pitsActuales || 0,
+    'Pits proyectados': p.pitsProyectados || 0,
+    'Pits teóricos': p.pitsTeóricos || 0,
+    'Pits definidos': p.pitsDefinidos || 0,
+    'Pits iniciales': p.pitsIniciales || 0,
+    'Metros cuadrados': p.metrosCuadrados || 0,
+    'Trabajar': p.trabajar,
+    'Tipificación': p.tipificacion,
+    'Ultima actualización': p.ultimaActualizacion || new Date().toISOString().split('T')[0]
+  };
+}
+
+// ══════════════════════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════════════════════
+async function syncFromSharePoint() {
+  setSyncStatus('loading', 'Sincronizando...');
+  try {
+    const url = `${SP_CONFIG.graphBase}/sites/${siteId}/lists/${listId}/items?$expand=fields&$top=500`;
+    const data = await spGet(url);
+    proyectos = data.value.map(item => spToApp(item));
+
+    // Load candidates
+    if (candidatesListId) {
+      const cUrl = `${SP_CONFIG.graphBase}/sites/${siteId}/lists/${candidatesListId}/items?$expand=fields&$top=500`;
+      const cData = await spGet(cUrl);
+      cData.value.forEach(item => {
+        const f = item.fields || item;
+        const projId = f['ID_x0020_Proyecto'] || f['ID Proyecto'];
+        const proj = proyectos.find(p => p.id === projId);
+        if (proj) {
+          if (!proj.candidatos) proj.candidatos = [];
+          proj.candidatos.push({
+            spId: item.id,
+            nombre: f['Title'] || f['Nombre candidato'] || '',
+            nit: f['NIT'] || '',
+            estado: f['Estado'] || 'En evaluación'
+          });
+        }
+      });
+    }
+
+    renderTable(); updateCounts();
+    const now = new Date();
+    setSyncStatus('ok', `Sincronizado ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`);
+    if (currentView === 'alertas') renderAlerts();
+  } catch(e) {
+    setSyncStatus('error', 'Error de sincronización');
+    showToast('Error al sincronizar: ' + e.message, 'error');
+  }
+}
+
+async function saveToSharePoint(p) {
+  const fields = appToSp(p);
+  try {
+    if (p.spId) {
+      await spPatch(`${SP_CONFIG.graphBase}/sites/${siteId}/lists/${listId}/items/${p.spId}/fields`, fields);
+    } else {
+      const result = await spPost(`${SP_CONFIG.graphBase}/sites/${siteId}/lists/${listId}/items`, { fields });
+      p.spId = result.id;
+    }
+    return true;
+  } catch(e) {
+    showToast('Error guardando en SharePoint: ' + e.message, 'error');
+    return false;
+  }
+}
+
+async function saveCandidatesToSharePoint(p) {
+  if (!candidatesListId) return;
+  for (const c of (p.candidatos || [])) {
+    if (!c.spId) {
+      try {
+        const result = await spPost(`${SP_CONFIG.graphBase}/sites/${siteId}/lists/${candidatesListId}/items`, {
+          fields: { 'Title': c.nombre, 'ID Proyecto': p.id, 'NIT': c.nit, 'Estado': c.estado }
+        });
+        c.spId = result.id;
+      } catch(e) { console.error('Error saving candidate', e); }
+    }
+  }
+}
+
+function setSyncStatus(state, text) {
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-text');
+  if (!dot || !txt) return;
+  dot.className = 'sync-dot' + (state === 'loading' ? ' loading' : state === 'error' ? ' error' : '');
+  txt.textContent = text;
+}
+
+// ══════════════════════════════════════════════════════
+// DATA (local fallback while loading)
+// ══════════════════════════════════════════════════════
+let proyectos = [];
+let currentView = 'proyectos';
+let selectedId = null;
+let modalMode = 'create';
+let editCandidatos = [];
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function nextId(tipo) {
+  const prefix = tipo === 'Apertura' ? 'OP' : 'EXP';
+  const nums = proyectos.filter(p=>p.id.startsWith(prefix)&&p.hasBP).map(p=>parseInt(p.id.substring(prefix.length))).filter(n=>!isNaN(n));
+  const next = nums.length > 0 ? Math.max(...nums)+1 : 1;
+  return `${prefix}${String(next).padStart(4,'0')}`;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const parts = d.split('T')[0].split('-');
+  if (parts.length < 3) return d;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function fmtMoney(v) { if (!v) return '—'; return '$'+parseInt(v).toLocaleString('es-CO'); }
+
+function daysDiff(dateStr) {
+  if (!dateStr) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(dateStr.split('T')[0]+'T00:00:00');
+  return Math.round((d-today)/(1000*60*60*24));
+}
+
+function monthsDiff(dateStr) {
+  if (!dateStr) return null;
+  const days = daysDiff(dateStr);
+  return days !== null ? days/30.44 : null;
+}
+
+function getSemaforo(p) {
+  if (p.etapa === '8. Operando') return { color:'var(--green)', label:'Operando' };
+  if (p.trabajar === 'No') return { color:'var(--text3)', label:'No trabajar' };
+  const days = daysDiff(p.propuestaTiempoDd);
+  if (days === null) return { color:'var(--text3)', label:'Sin fecha' };
+  if (days < 0) return { color:'#C62828', label:'Fecha vencida' };
+  if (days <= 30) return { color:'#C62828', label:days+'d restantes' };
+  const cfg = STAGE_REQUIRED[p.etapa]||{};
+  const vals = {'e-pits-teo':p.pitsTeóricos,'e-tamano':p.tamano,'e-tipif':p.tipificacion,'e-m2':p.metrosCuadrados,'e-canal':p.canal,'e-pits-def':p.pitsDefinidos,'e-pits-ini':p.pitsIniciales,'e-pits-proy':p.pitsProyectados,'e-fecha':p.propuestaTiempoDd};
+  const hasMissing = (cfg.advanceReq||[]).some(f=>!vals[f]);
+  if (days <= 90 || hasMissing) return { color:'#EFB400', label:days+'d restantes' };
+  return { color:'var(--green)', label:days+'d restantes' };
+}
+
+function getPrioridadColor(p) {
+  if (p.tipoPriorizacion==='Alta') return 'var(--red)';
+  if (p.tipoPriorizacion==='Media') return 'var(--amber)';
+  if (p.tipoPriorizacion==='Baja') return 'var(--text3)';
+  return 'var(--border)';
+}
+
+// ══════════════════════════════════════════════════════
+// ALERTS
+// ══════════════════════════════════════════════════════
+function getAlerts() {
+  const alerts = { critical:[], high:[], medium:[], watch:[], stale:[] };
+  proyectos.forEach(p => {
+    if (p.trabajar !== 'Si' || p.etapa === '8. Operando') return;
+    const etapaIdx = ETAPAS.indexOf(p.etapa);
+    const days = daysDiff(p.propuestaTiempoDd);
+    const months = days !== null ? days/30.44 : null;
+    if (days !== null && days <= 30) {
+      alerts.critical.push({ p, reason: days < 0 ? `Fecha vencida hace ${Math.abs(days)} días` : days === 0 ? 'Apertura hoy' : `Apertura en ${days} días`, days });
+    } else if (etapaIdx <= 4 && months !== null && months >= 0 && months <= 4) {
+      alerts.high.push({ p, reason:`Etapa temprana con apertura en ${Math.round(days)} días`, days });
+    } else if ((etapaIdx === 3||etapaIdx === 4) && months !== null && months >= 0 && months <= 2) {
+      alerts.high.push({ p, reason:`Layout/Diseño con apertura en ${Math.round(days)} días`, days });
+    } else if (p.tipoPriorizacion === 'Alta' && months !== null && months >= 0 && months <= 6) {
+      alerts.medium.push({ p, reason:`Prioridad Alta — apertura en ${Math.round(days)} días`, days });
+    } else if (months !== null && months >= 0 && months <= 6) {
+      alerts.watch.push({ p, reason:`Apertura en ${Math.round(days)} días`, days });
+    }
+    if (p.ultimaActualizacion) {
+      const d = daysDiff(p.ultimaActualizacion);
+      if (d !== null && d <= -30) alerts.stale.push({ p, reason:`Sin actualización hace ${Math.abs(d)} días`, days:Math.abs(d) });
+    }
+  });
+  const sortGroup = arr => arr.sort((a,b) => {
+    const pA = a.p.tipoPriorizacion==='Alta'?0:a.p.tipoPriorizacion==='Media'?1:2;
+    const pB = b.p.tipoPriorizacion==='Alta'?0:b.p.tipoPriorizacion==='Media'?1:2;
+    return pA!==pB ? pA-pB : (a.days||0)-(b.days||0);
+  });
+  sortGroup(alerts.critical); sortGroup(alerts.high); sortGroup(alerts.medium); sortGroup(alerts.watch);
+  return alerts;
+}
+
+function getTotalAlerts() {
+  const a = getAlerts();
+  return a.critical.length+a.high.length+a.medium.length+a.watch.length+a.stale.length;
+}
+
+function prioTag(p) {
+  if (!p.tipoPriorizacion) return '';
+  const colors = {'Alta':'background:var(--red-soft);color:var(--red)','Media':'background:var(--amber-bg);color:var(--amber)','Baja':'background:var(--surface2);color:var(--text3)'};
+  return `<span style="font-size:10px;padding:2px 7px;border-radius:3px;font-weight:600;${colors[p.tipoPriorizacion]||''}">${p.tipoPriorizacion}</span>`;
+}
+
+function renderAlerts() {
+  const alerts = getAlerts();
+  const container = document.getElementById('alerts-view');
+  const groups = [
+    { key:'critical', title:'🔴 Crítico — Fecha vencida o menos de 30 días', sev:'sev-critical', chip:'chip-critical', items:alerts.critical },
+    { key:'high', title:'🟠 Alto — Etapas tempranas con apertura próxima', sev:'sev-high', chip:'chip-high', items:alerts.high },
+    { key:'medium', title:'🟡 Prioridad Alta — Apertura en menos de 6 meses', sev:'sev-medium', chip:'chip-medium', items:alerts.medium },
+    { key:'watch', title:'👁 Seguimiento — Todos los proyectos con apertura en 6 meses', sev:'sev-stale', chip:'chip-stale', items:alerts.watch },
+    { key:'stale', title:'⚫ Sin actividad — Más de 30 días sin actualizar', sev:'sev-stale', chip:'chip-stale', items:alerts.stale }
+  ];
+  container.innerHTML = '<div class="alerts-grid">'+groups.map(g=>`
+    <div class="alert-group">
+      <div class="alert-group-header"><div class="alert-severity ${g.sev}"></div><div class="alert-group-title">${g.title}</div><div class="alert-group-sub">${g.items.length} proyecto${g.items.length!==1?'s':''}</div></div>
+      ${g.items.length===0?'<div class="alert-empty">Sin alertas en esta categoría ✓</div>':g.items.map(({p,reason})=>`
+        <div class="alert-row" onclick="openDetail('${p.id}')" style="grid-template-columns:1fr auto auto auto auto">
+          <div><div class="alert-name">${p.nombreComercial}</div><div class="alert-meta">${p.hasBP?p.id:'PRE-BP'} · ${p.ciudad} · ${p.responsable}</div></div>
+          ${prioTag(p)}<span class="badge ${p.tipo==='Apertura'?'badge-ap':'badge-exp'}">${p.tipo}</span>
+          <span class="alert-chip ${g.chip}">${reason}</span>
+          <div class="alert-date">${fmtDate(p.propuestaTiempoDd)}</div>
+        </div>`).join('')}
+    </div>`).join('')+'</div>';
+}
+
+// ══════════════════════════════════════════════════════
+// VIEWS & TABLE
+// ══════════════════════════════════════════════════════
+function setView(view, el) {
+  currentView=view;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const titles={proyectos:['Todos los proyectos','Plan de expansión y aperturas de red DD'],aperturas:['Aperturas','Nuevos puntos de venta'],expansiones:['Expansiones','Ampliación de puntos existentes'],activos:['En curso','Proyectos activos'],operando:['Operando','Puntos en operación'],alertas:['Alertas de seguimiento','Proyectos que requieren atención']};
+  const [t,s]=titles[view]||titles.proyectos;
+  document.getElementById('view-title').textContent=t;
+  document.getElementById('view-sub').textContent=s;
+  const isAlerts=view==='alertas';
+  document.getElementById('table-view').style.display=isAlerts?'none':'block';
+  document.getElementById('alerts-view').style.display=isAlerts?'block':'none';
+  document.getElementById('filters-bar').style.display=isAlerts?'none':'flex';
+  document.getElementById('btn-nuevo').style.display=isAlerts?'none':'inline-flex';
+  closeDetail();
+  if(isAlerts) renderAlerts(); else renderTable();
+}
+
+function getFiltered() {
+  let list=[...proyectos];
+  if(currentView==='aperturas') list=list.filter(p=>p.tipo==='Apertura');
+  if(currentView==='expansiones') list=list.filter(p=>p.tipo==='Expansión');
+  if(currentView==='activos') list=list.filter(p=>p.trabajar==='Si'&&p.etapa!=='8. Operando');
+  if(currentView==='operando') list=list.filter(p=>p.etapa==='8. Operando');
+  const q=document.getElementById('search-input').value.toLowerCase();
+  const region=document.getElementById('filter-region').value;
+  const etapa=document.getElementById('filter-etapa').value;
+  const resp=document.getElementById('filter-responsable').value;
+  if(q) list=list.filter(p=>p.nombreComercial.toLowerCase().includes(q)||p.id.toLowerCase().includes(q)||p.ciudad.toLowerCase().includes(q));
+  if(region) list=list.filter(p=>p.region===region);
+  if(etapa) list=list.filter(p=>p.etapa===etapa);
+  if(resp) list=list.filter(p=>p.responsable===resp);
+  return list;
+}
+
+function renderTable() {
+  const list=getFiltered();
+  const tbody=document.getElementById('table-body');
+  const empty=document.getElementById('empty-state');
+  if(!list.length){tbody.innerHTML='';empty.style.display='block';updateCounts();return;}
+  empty.style.display='none';
+  tbody.innerHTML=list.map(p=>{
+    const sem=getSemaforo(p);
+    const prioColor=getPrioridadColor(p);
+    const days=daysDiff(p.propuestaTiempoDd);
+    const dateStyle=days!==null&&days>=0&&days<=120?'color:var(--red);font-weight:500':'';
+    return `<tr onclick="openDetail('${p.id}')" class="${selectedId===p.id?'selected':''}">
+      <td style="padding:12px 8px 12px 16px;width:28px"><div style="display:flex;flex-direction:column;align-items:center;gap:3px"><span title="${sem.label}" style="color:${sem.color};font-size:14px;line-height:1">●</span><span title="Prioridad: ${p.tipoPriorizacion||'Sin definir'}" style="color:${prioColor};font-size:8px;line-height:1">▲</span></div></td>
+      <td class="td-id ${p.hasBP?'has-bp':''}">${p.hasBP?p.id:'<span style="color:var(--purple);font-family:'DM Mono',monospace;font-size:11px">PRE-BP</span>'}</td>
+      <td><div class="td-name">${p.nombreComercial}</div><div class="td-sub">${p.ciudad}, ${p.departamento}</div></td>
+      <td>${p.tipo==='Apertura'?'<span class="badge badge-ap">Apertura</span>':'<span class="badge badge-exp">Expansión</span>'}</td>
+      <td><div style="font-size:13px">${p.region}</div><div class="td-sub">${p.zona}</div></td>
+      <td><span class="${p.hasBP?'badge badge-etapa':'badge badge-prebp'}">${p.etapa.replace(/^\d+\.?\d*\s/,'')}</span></td>
+      <td style="font-size:13px;white-space:nowrap;${dateStyle}">${fmtDate(p.propuestaTiempoDd)}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:13px">${p.pitsProyectados||'—'}</td>
+      <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width:${p.ejecucion}%"></div></div><span class="progress-pct">${p.ejecucion}%</span></div></td>
+      <td style="font-size:13px">${p.responsable}</td>
+    </tr>`;
+  }).join('');
+  updateCounts();
+}
+
+function updateCounts() {
+  document.getElementById('count-total').textContent=proyectos.length;
+  document.getElementById('count-ap').textContent=proyectos.filter(p=>p.tipo==='Apertura').length;
+  document.getElementById('count-exp').textContent=proyectos.filter(p=>p.tipo==='Expansión').length;
+  document.getElementById('count-activos').textContent=proyectos.filter(p=>p.trabajar==='Si'&&p.etapa!=='8. Operando').length;
+  document.getElementById('count-op').textContent=proyectos.filter(p=>p.etapa==='8. Operando').length;
+  document.getElementById('stat-total').textContent=proyectos.length;
+  document.getElementById('stat-ap').textContent=proyectos.filter(p=>p.tipo==='Apertura').length;
+  document.getElementById('stat-exp').textContent=proyectos.filter(p=>p.tipo==='Expansión').length;
+  const n=getTotalAlerts();
+  document.getElementById('count-alertas').textContent=n;
+  document.getElementById('alert-dot').style.display=n>0?'block':'none';
+  const up=proyectos.filter(p=>p.propuestaTiempoDd&&p.etapa!=='8. Operando').sort((a,b)=>a.propuestaTiempoDd.localeCompare(b.propuestaTiempoDd))[0];
+  if(up){document.getElementById('stat-next').textContent=fmtDate(up.propuestaTiempoDd);document.getElementById('stat-next-name').textContent=up.nombreComercial;}
+}
+
+function populateFilters() {
+  const etapaSel=document.getElementById('filter-etapa');
+  etapaSel.innerHTML='<option value="">Todas las etapas</option>';
+  ETAPAS.forEach(e=>{const o=document.createElement('option');o.value=e;o.textContent=e;etapaSel.appendChild(o);});
+  const respSel=document.getElementById('filter-responsable');
+  respSel.innerHTML='<option value="">Todos los responsables</option>';
+  RESPONSABLES.forEach(r=>{const o=document.createElement('option');o.value=r;o.textContent=r;respSel.appendChild(o);});
+}
+
+// ══════════════════════════════════════════════════════
+// DETAIL PANEL
+// ══════════════════════════════════════════════════════
+function openDetail(id) {
+  const p=proyectos.find(x=>x.id===id); if(!p) return;
+  selectedId=id; renderTable();
+  document.getElementById('dp-id').textContent=p.hasBP?p.id:'Sin ID — Pendiente Business Plan';
+  document.getElementById('dp-title').textContent=p.nombreComercial;
+  const etapaIdx=ETAPAS.indexOf(p.etapa);
+  const diff=(p.pitsProyectados||0)-(p.pitsActuales||0);
+  document.getElementById('dp-badges').innerHTML=`
+    ${p.tipo==='Apertura'?'<span class="badge badge-ap">Apertura</span>':'<span class="badge badge-exp">Expansión</span>'}
+    ${!p.hasBP?'<span class="badge badge-prebp">Pre-BP</span>':''}
+    ${p.tipoPriorizacion?`<span class="badge" style="background:var(--surface2);color:var(--text2)">${p.tipoPriorizacion}</span>`:''}
+    ${p.trabajar==='No'?'<span class="badge badge-no">No trabajar</span>':''}`;
+  const bpSection=!p.hasBP?`<div class="bp-notice" style="margin-bottom:20px"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v4M8 11v.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><div class="bp-notice-text"><strong>Sin Business Plan aprobado.</strong> El ID oficial se asignará al aprobar el BP.</div></div><button class="btn btn-primary" style="margin-bottom:20px;width:100%;justify-content:center" onclick="openBPModal('${p.id}')">✓ Aprobar Business Plan y asignar ID oficial</button>`:'';
+  document.getElementById('detail-body').innerHTML=bpSection+`
+    <div class="detail-section"><div class="detail-section-title">Información general</div><div class="detail-grid">
+      <div class="detail-field"><div class="detail-field-label">Ciudad</div><div class="detail-field-value">${p.ciudad}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Departamento</div><div class="detail-field-value">${p.departamento}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Región</div><div class="detail-field-value">${p.region}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Zona</div><div class="detail-field-value">${p.zona}</div></div>
+      ${p.razonSocial?`<div class="detail-field" style="grid-column:1/-1"><div class="detail-field-label">Razón social</div><div class="detail-field-value">${p.razonSocial}</div></div>`:''}
+      ${p.nitSucursal?`<div class="detail-field"><div class="detail-field-label">NIT-Sucursal</div><div class="detail-field-value" style="font-family:'DM Mono',monospace;font-size:12px">${p.nitSucursal}</div></div>`:''}
+      ${p.canal?`<div class="detail-field"><div class="detail-field-label">Canal</div><div class="detail-field-value">${p.canal}</div></div>`:''}
+      <div class="detail-field"><div class="detail-field-label">Responsable</div><div class="detail-field-value">${p.responsable}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Priorización</div><div class="detail-field-value ${!p.tipoPriorizacion?'empty':''}">${p.tipoPriorizacion||'Sin definir'}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Tamaño</div><div class="detail-field-value ${!p.tamano?'empty':''}">${p.tamano||'Sin definir'}</div></div>
+    </div></div>
+    <div class="detail-section"><div class="detail-section-title">Fechas y progreso</div><div class="detail-grid">
+      <div class="detail-field"><div class="detail-field-label">Inicio proyecto</div><div class="detail-field-value">${fmtDate(p.inicioProyecto)}</div></div>
+      <div class="detail-field"><div class="detail-field-label">Inicio operación estimado</div><div class="detail-field-value" style="color:var(--red)">${fmtDate(p.propuestaTiempoDd)}</div></div>
+      <div class="detail-field"><div class="detail-field-label">% Ejecución</div><div style="margin-top:4px"><div class="progress-wrap"><div class="progress-bar" style="min-width:100px"><div class="progress-fill" style="width:${p.ejecucion}%"></div></div><span class="progress-pct">${p.ejecucion}%</span></div></div></div>
+      ${p.metrosCuadrados?`<div class="detail-field"><div class="detail-field-label">Metros cuadrados</div><div class="detail-field-value">${p.metrosCuadrados} m²</div></div>`:''}
+    </div></div>
+    <div class="detail-section"><div class="detail-section-title">Pits</div><div class="pits-grid">
+      <div class="pit-cell"><div class="pit-cell-label">Actuales</div><div class="pit-cell-value">${p.pitsActuales||'—'}</div></div>
+      <div class="pit-cell"><div class="pit-cell-label">Teóricos</div><div class="pit-cell-value">${p.pitsTeóricos||'—'}</div></div>
+      <div class="pit-cell"><div class="pit-cell-label">Definidos</div><div class="pit-cell-value">${p.pitsDefinidos||'—'}</div></div>
+      <div class="pit-cell"><div class="pit-cell-label">Iniciales</div><div class="pit-cell-value">${p.pitsIniciales||'—'}</div></div>
+      <div class="pit-cell"><div class="pit-cell-label">Proyectados</div><div class="pit-cell-value">${p.pitsProyectados||'—'}</div></div>
+      <div class="pit-cell diff"><div class="pit-cell-label">Diferencia</div><div class="pit-cell-value ${diff<0?'negative':''}">${diff!==0?(diff>0?'+'+diff:diff):'—'}</div></div>
+    </div></div>
+    <div class="detail-section"><div class="detail-section-title">Etapa del proyecto</div><div class="etapa-track">${ETAPAS.map((e,i)=>`<div class="etapa-step ${i<etapaIdx?'done':i===etapaIdx?'current':''}"><div class="etapa-dot"></div><span>${e}</span></div>`).join('')}</div></div>
+    ${p.comentario?`<div class="detail-section"><div class="detail-section-title">Comentario</div><div style="font-size:13.5px;color:var(--text2);line-height:1.6">${p.comentario}</div></div>`:''}
+    ${p.candidatos&&p.candidatos.length>0?`<div class="detail-section"><div class="detail-section-title">Candidatos</div>${p.candidatos.map(c=>`<div class="candidate-card"><div class="candidate-name">${c.nombre}</div><div class="candidate-meta">${c.nit||''} · ${c.estado}</div></div>`).join('')}</div>`:''}
+    ${(p.inversionDd||p.inversionPosventa)?`<div class="detail-section"><div class="detail-section-title">Inversiones</div><div class="detail-grid">${p.inversionDd?`<div class="detail-field"><div class="detail-field-label">Inversión DD</div><div class="detail-field-value" style="font-family:'DM Mono',monospace;font-size:12px">${fmtMoney(p.inversionDd)}</div></div>`:''} ${p.inversionPosventa?`<div class="detail-field"><div class="detail-field-label">Inversión Posventa</div><div class="detail-field-value" style="font-family:'DM Mono',monospace;font-size:12px">${fmtMoney(p.inversionPosventa)}</div></div>`:''}</div></div>`:''}
+    ${p.historial&&p.historial.length>0?`<div class="detail-section"><div class="detail-section-title">Historial de cambios</div><div style="display:flex;flex-direction:column;gap:8px">${p.historial.slice(0,10).map(h=>`<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px"><div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);margin-bottom:6px">${h.fecha}</div>${h.cambios.map(c=>`<div style="font-size:12.5px;color:var(--text2);margin-bottom:3px"><span style="color:var(--text3)">${c.label}:</span> <span style="text-decoration:line-through;color:var(--text3)">${c.from}</span> → <strong>${c.to}</strong></div>`).join('')}</div>`).join('')}</div></div>`:''}
+  `;
+  document.getElementById('detail-panel').classList.add('open');
+}
+
+function closeDetail(){selectedId=null;document.getElementById('detail-panel').classList.remove('open');renderTable();}
+
+// ══════════════════════════════════════════════════════
+// BP MODAL
+// ══════════════════════════════════════════════════════
+function openBPModal(id) {
+  const p=proyectos.find(x=>x.id===id); if(!p) return;
+  const newId=nextId(p.tipo);
+  document.getElementById('modal-title').textContent='Aprobar Business Plan';
+  document.getElementById('modal-sub').textContent=p.nombreComercial;
+  document.getElementById('modal-body').innerHTML=`
+    <p style="font-size:13.5px;color:var(--text2);margin-bottom:16px;line-height:1.6">Al aprobar el Business Plan, este proyecto recibirá su ID oficial y será incluido en los reportes de Power BI.</p>
+    <div class="bp-assign-box"><div style="font-size:12px;color:var(--blue);font-family:'DM Mono',monospace;letter-spacing:0.5px;text-transform:uppercase">ID que se asignará</div><div class="bp-assign-id">${newId}</div><div style="font-size:12px;color:var(--blue)">${p.tipo} · ${p.ciudad}</div></div>
+    <div class="form-section" style="margin-top:16px"><div class="form-grid">
+      <div class="field"><label>Tamaño <span class="required">*</span></label><select id="bp-tamano"><option value="">Seleccionar...</option>${TAMANIOS.map(t=>`<option>${t}</option>`).join('')}</select><span class="field-error" id="err-bp-tamano">Obligatorio</span></div>
+      <div class="field"><label>Tipificación <span class="required">*</span></label><select id="bp-tipif"><option value="">Seleccionar...</option>${TIPIFICACIONES.map(t=>`<option>${t}</option>`).join('')}</select><span class="field-error" id="err-bp-tipif">Obligatorio</span></div>
+      <div class="field"><label>Pits teóricos <span class="required">*</span></label><input type="number" id="bp-pits" min="0" placeholder="0"><span class="field-error" id="err-bp-pits">Obligatorio</span></div>
+      <div class="field"><label>Inicio operación estimado <span class="req-etapa">confirmar</span></label><input type="date" id="bp-fecha" class="date-highlight" value="${p.propuestaTiempoDd||''}"></div>
+    </div></div>`;
+  document.getElementById('modal-footer-left').innerHTML='';
+  document.getElementById('modal-submit').textContent='Aprobar BP y asignar ID';
+  document.getElementById('modal-submit').onclick=()=>handleBPApprove(id,newId);
+  document.getElementById('modal-overlay').classList.add('open');
+  modalMode='bp';
+}
+
+async function handleBPApprove(oldId, newId) {
+  const tamano=document.getElementById('bp-tamano').value;
+  const tipif=document.getElementById('bp-tipif').value;
+  const pits=document.getElementById('bp-pits').value;
+  let valid=true;
+  if(!tamano){document.getElementById('bp-tamano').classList.add('error');document.getElementById('err-bp-tamano').classList.add('show');valid=false;}
+  if(!tipif){document.getElementById('bp-tipif').classList.add('error');document.getElementById('err-bp-tipif').classList.add('show');valid=false;}
+  if(!pits){document.getElementById('bp-pits').classList.add('error');document.getElementById('err-bp-pits').classList.add('show');valid=false;}
+  if(!valid) return;
+  const p=proyectos.find(x=>x.id===oldId);
+  p.id=newId; p.hasBP=true;
+  p.tamano=tamano; p.tipificacion=tipif;
+  p.pitsTeóricos=parseInt(pits)||0;
+  p.etapa=ETAPAS[1];
+  const fecha=document.getElementById('bp-fecha').value;
+  if(fecha) p.propuestaTiempoDd=fecha;
+  p.ultimaActualizacion=new Date().toISOString().split('T')[0];
+  setSyncStatus('loading','Guardando...');
+  const ok=await saveToSharePoint(p);
+  if(ok){closeModal();renderTable();updateCounts();openDetail(newId);showToast(`ID ${newId} asignado y guardado en SharePoint`,'success');}
+  setSyncStatus('ok','Guardado');
+}
+
+// ══════════════════════════════════════════════════════
+// CREATE / EDIT MODAL
+// ══════════════════════════════════════════════════════
+function buildCreateForm() {
+  const dptos=Object.keys(COL_DPTOS).sort();
+  return `
+    <div class="form-section"><div class="form-section-title">Identificación</div><div class="form-grid">
+      <div class="field"><label>Categoría <span class="required">*</span></label><select id="f-categoria" onchange="onCategoriaChange()"><option value="Apertura">Apertura</option><option value="Expansión">Expansión</option></select></div>
+      <div class="field"><label>ID</label><div class="id-preview">Se asignará al aprobar el BP</div></div>
+      <div class="field"><label>Nombre comercial <span class="required">*</span></label><input type="text" id="f-nombre" placeholder="Ej: Honda Bogotá Calle 63"><span class="field-error" id="err-nombre">Campo obligatorio</span></div>
+      <div class="field"><label>Razón social <span id="razon-req-label" class="optional-tag">opcional</span></label><input type="text" id="f-razon"></div>
+      <div class="field" id="nit-field" style="display:none"><label>NIT-SUCURSAL <span class="required">*</span></label><input type="text" id="f-nit"><span class="field-error" id="err-nit">Obligatorio para expansiones</span></div>
+      <div class="field" id="canal-field" style="display:none"><label>Canal <span class="required">*</span></label><input type="text" id="f-canal"><span class="field-error" id="err-canal">Obligatorio para expansiones</span></div>
+    </div></div>
+    <div class="form-section"><div class="form-section-title">Ubicación</div><div class="form-grid">
+      <div class="field"><label>Región comercial <span class="required">*</span></label><select id="f-region" onchange="updateZonas()"><option value="">Seleccionar...</option><option>R1</option><option>R2</option><option>R3</option></select><span class="field-error" id="err-region">Selecciona una región</span></div>
+      <div class="field"><label>Zona comercial <span class="required">*</span></label><select id="f-zona"><option value="">Seleccionar región primero</option></select><span class="field-error" id="err-zona">Selecciona una zona</span></div>
+      <div class="field"><label>Departamento <span class="required">*</span></label><select id="f-dpto" onchange="updateCiudades()"><option value="">Seleccionar...</option>${dptos.map(d=>`<option value="${d}">${d}</option>`).join('')}</select><span class="field-error" id="err-dpto">Campo obligatorio</span></div>
+      <div class="field"><label>Ciudad <span class="required">*</span></label><select id="f-ciudad"><option value="">Seleccionar departamento primero</option></select><span class="field-error" id="err-ciudad">Campo obligatorio</span></div>
+    </div></div>
+    <div class="form-section"><div class="form-section-title">Planificación</div><div class="form-grid">
+      <div class="field"><label>Responsable <span class="required">*</span></label><select id="f-resp"><option value="">Seleccionar...</option>${RESPONSABLES.map(r=>`<option>${r}</option>`).join('')}</select><span class="field-error" id="err-resp">Selecciona un responsable</span></div>
+      <div class="field"><label>Inicio operación estimado <span class="required">*</span></label><input type="date" id="f-fecha" class="date-highlight"><span class="field-error" id="err-fecha">Campo obligatorio</span></div>
+      <div class="field"><label>Tipo de priorización <span class="optional-tag">opcional</span></label><select id="f-prior"><option value="">Sin definir</option><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+      <div class="field"><label>Inicio del proyecto <span class="optional-tag">opcional</span></label><input type="date" id="f-inicio"></div>
+      <div class="field form-full"><label>Comentario <span class="optional-tag">opcional</span></label><textarea id="f-comentario" placeholder="Notas relevantes..."></textarea></div>
+    </div></div>`;
+}
+
+function buildEditForm(p) {
+  const cfg=STAGE_REQUIRED[p.etapa]||{};
+  const reqFields=cfg.advanceReq||[];
+  const missingLabels={'e-pits-teo':'Pits teóricos','e-tamano':'Tamaño','e-tipif':'Tipificación','e-m2':'Metros cuadrados','e-canal':'Canal','e-pits-def':'Pits definidos','e-pits-ini':'Pits iniciales','e-pits-proy':'Pits proyectados','e-fecha':'Inicio operación estimado'};
+  const vals={'e-pits-teo':p.pitsTeóricos,'e-tamano':p.tamano,'e-tipif':p.tipificacion,'e-m2':p.metrosCuadrados,'e-canal':p.canal,'e-pits-def':p.pitsDefinidos,'e-pits-ini':p.pitsIniciales,'e-pits-proy':p.pitsProyectados,'e-fecha':p.propuestaTiempoDd};
+  const missingNow=reqFields.filter(f=>!vals[f]);
+  const warnHtml=missingNow.length?`<div class="warn-banner"><div>⚠️ <strong>Para avanzar a la siguiente etapa</strong> se requiere:<ul>${missingNow.map(f=>`<li>${missingLabels[f]}</li>`).join('')}</ul></div></div>`:'';
+  const candidateWarn=['3.1 Selección de Candidato','3.2 Alineación candidato'].includes(p.etapa)&&(!p.candidatos||!p.candidatos.length)?`<div class="warn-banner">⚠️ <strong>Se requiere al menos un candidato</strong> para avanzar.</div>`:'';
+  return `
+    <div class="tabs"><div class="tab active" onclick="switchTab(event,'tab-general')">General</div><div class="tab" onclick="switchTab(event,'tab-pits')">Pits y espacio</div><div class="tab" onclick="switchTab(event,'tab-inversiones')">Inversiones</div><div class="tab" onclick="switchTab(event,'tab-candidatos')">Candidatos${p.candidatos&&p.candidatos.length?`<span class="tab-badge">${p.candidatos.length}</span>`:''}</div></div>
+    <div id="tab-general">${warnHtml}${candidateWarn}<div class="form-section"><div class="form-section-title">Estado del proyecto</div><div class="form-grid">
+      <div class="field"><label>Etapa</label><select id="e-etapa" onchange="onEtapaEditChange(this.value)">${ETAPAS.map(e=>`<option ${p.etapa===e?'selected':''}>${e}</option>`).join('')}</select></div>
+      <div class="field"><label>% Ejecución</label><input type="number" id="e-ejec" value="${p.ejecucion}" min="0" max="100"></div>
+      <div class="field"><label>Inicio operación estimado <span class="req-etapa">actualizar siempre</span></label><input type="date" id="e-fecha" class="date-highlight" value="${p.propuestaTiempoDd||''}"></div>
+      <div class="field"><label>Responsable</label><select id="e-resp">${RESPONSABLES.map(r=>`<option ${p.responsable===r?'selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="field"><label>Tamaño ${reqFields.includes('e-tamano')?'<span class="req-etapa">requerido</span>':''}</label><select id="e-tamano"><option value="">Sin definir</option>${TAMANIOS.map(t=>`<option ${p.tamano===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Tipificación ${reqFields.includes('e-tipif')?'<span class="req-etapa">requerido</span>':''}</label><select id="e-tipif"><option value="">Sin definir</option>${TIPIFICACIONES.map(t=>`<option ${p.tipificacion===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>Trabajar</label><select id="e-trabajar"><option value="Si" ${p.trabajar==='Si'?'selected':''}>Sí</option><option value="No" ${p.trabajar==='No'?'selected':''}>No</option></select></div>
+      <div class="field"><label>NIT-SUCURSAL ${p.tipo==='Expansión'?'<span class="req-etapa">expansión</span>':''}</label><input type="text" id="e-nit" value="${p.nitSucursal||''}"></div>
+      <div class="field"><label>Canal ${reqFields.includes('e-canal')?'<span class="req-etapa">requerido</span>':''}</label><input type="text" id="e-canal" value="${p.canal||''}"></div>
+      <div class="field form-full"><label>Comentario</label><textarea id="e-comentario">${p.comentario||''}</textarea></div>
+    </div><div id="etapa-advance-warn" style="margin-top:12px"></div></div></div>
+    <div id="tab-pits" style="display:none"><div class="form-section"><div class="form-section-title">Pits</div><div class="form-grid-3">
+      <div class="field"><label>Pits actuales</label><input type="number" id="e-pits-act" value="${p.pitsActuales||''}" min="0"></div>
+      <div class="field"><label>Pits teóricos ${reqFields.includes('e-pits-teo')?'<span class="req-etapa">requerido</span>':''}</label><input type="number" id="e-pits-teo" value="${p.pitsTeóricos||''}" min="0"></div>
+      <div class="field"><label>Pits definidos ${reqFields.includes('e-pits-def')?'<span class="req-etapa">requerido</span>':''}</label><input type="number" id="e-pits-def" value="${p.pitsDefinidos||''}" min="0"></div>
+      <div class="field"><label>Pits iniciales ${reqFields.includes('e-pits-ini')?'<span class="req-etapa">requerido</span>':''}</label><input type="number" id="e-pits-ini" value="${p.pitsIniciales||''}" min="0"></div>
+      <div class="field"><label>Pits proyectados ${reqFields.includes('e-pits-proy')?'<span class="req-etapa">requerido</span>':''}</label><input type="number" id="e-pits-proy" value="${p.pitsProyectados||''}" min="0"></div>
+      <div class="field"><label>Metros cuadrados ${reqFields.includes('e-m2')?'<span class="req-etapa">requerido</span>':''}</label><input type="number" id="e-m2" value="${p.metrosCuadrados||''}" min="0"></div>
+    </div></div></div>
+    <div id="tab-inversiones" style="display:none"><div class="form-section"><div class="form-section-title">Inversiones (COP)</div><div class="form-grid">
+      <div class="field"><label>Inversión DD</label><input type="number" id="e-inv-dd" value="${p.inversionDd||''}" placeholder="0"></div>
+      <div class="field"><label>Inversión Posventa</label><input type="number" id="e-inv-pos" value="${p.inversionPosventa||''}" placeholder="0"></div>
+      <div class="field"><label>Inv. Posventa Mercadeo</label><input type="number" id="e-inv-posm" value="${p.inversionPosvMercadeo||''}" placeholder="0"></div>
+      <div class="field"><label>Inversión Mercadeo</label><input type="number" id="e-inv-mer" value="${p.inversionMercadeo||''}" placeholder="0"></div>
+    </div></div></div>
+    <div id="tab-candidatos" style="display:none"><div class="form-section"><div class="form-section-title">Candidatos</div><div id="candidatos-list">${(p.candidatos||[]).map((c,i)=>`<div class="candidate-card" id="cand-${i}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="candidate-name">${c.nombre}</div><div class="candidate-meta">${c.nit||''} · ${c.estado}</div></div><button class="btn btn-ghost" style="font-size:11px;padding:4px 8px" onclick="removeCandidato(${i})">Quitar</button></div></div>`).join('')}</div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)"><div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:10px">Agregar candidato</div><div class="form-grid">
+      <div class="field"><label>Nombre</label><input type="text" id="nc-nombre" placeholder="Nombre del candidato"></div>
+      <div class="field"><label>NIT</label><input type="text" id="nc-nit" placeholder="NIT"></div>
+      <div class="field"><label>Estado</label><select id="nc-estado"><option>En evaluación</option><option>Pre-seleccionado</option><option>Seleccionado</option><option>Descartado</option></select></div>
+    </div><button class="btn btn-secondary" style="margin-top:10px" onclick="addCandidato()">+ Agregar candidato</button></div></div></div>`;
+}
+
+function onCategoriaChange() {
+  const isExp=document.getElementById('f-categoria').value==='Expansión';
+  document.getElementById('nit-field').style.display=isExp?'block':'none';
+  document.getElementById('canal-field').style.display=isExp?'block':'none';
+  document.getElementById('razon-req-label').textContent=isExp?'* requerido':'opcional';
+}
+
+function updateZonas() {
+  const r=document.getElementById('f-region').value;
+  const zonas=REGIONES_ZONAS[r]||[];
+  const sel=document.getElementById('f-zona');
+  sel.innerHTML=zonas.length?'<option value="">Seleccionar...</option>'+zonas.map(z=>`<option>${z}</option>`).join(''):'<option value="">Seleccionar región primero</option>';
+}
+
+function updateCiudades() {
+  const dpto=document.getElementById('f-dpto').value;
+  const ciudades=COL_DPTOS[dpto]||[];
+  const sel=document.getElementById('f-ciudad');
+  sel.innerHTML=ciudades.length?'<option value="">Seleccionar...</option>'+ciudades.map(c=>`<option>${c}</option>`).join(''):'<option value="">Seleccionar departamento primero</option>';
+}
+
+function onEtapaEditChange(newEtapa) {
+  const cfg=STAGE_REQUIRED[newEtapa]||{};
+  const w=document.getElementById('etapa-advance-warn');
+  if(w&&cfg.note) w.innerHTML=`<div class="warn-banner" style="background:var(--blue-bg);border-color:#C5D8F8;color:var(--blue)">ℹ️ ${cfg.note}</div>`;
+  else if(w) w.innerHTML='';
+}
+
+function switchTab(e,tabId) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  e.target.classList.add('active');
+  ['tab-general','tab-pits','tab-inversiones','tab-candidatos'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=id===tabId?'block':'none';});
+}
+
+function addCandidato() {
+  const nombre=document.getElementById('nc-nombre').value.trim();
+  if(!nombre){showToast('Ingresa el nombre del candidato','error');return;}
+  const nit=document.getElementById('nc-nit').value.trim();
+  const estado=document.getElementById('nc-estado').value;
+  const i=editCandidatos.length;
+  editCandidatos.push({nombre,nit,estado});
+  const div=document.createElement('div');
+  div.className='candidate-card';div.id=`cand-${i}`;
+  div.innerHTML=`<div style="display:flex;justify-content:space-between"><div><div class="candidate-name">${nombre}</div><div class="candidate-meta">${nit} · ${estado}</div></div><button class="btn btn-ghost" style="font-size:11px;padding:4px 8px" onclick="removeCandidato(${i})">Quitar</button></div>`;
+  document.getElementById('candidatos-list').appendChild(div);
+  document.getElementById('nc-nombre').value='';document.getElementById('nc-nit').value='';
+}
+
+function removeCandidato(i){editCandidatos.splice(i,1);document.getElementById(`cand-${i}`)?.remove();}
+
+function openModal(mode,id) {
+  modalMode=mode;
+  document.getElementById('modal-footer-left').innerHTML='';
+  const submitBtn=document.getElementById('modal-submit');
+  if(mode==='create'){
+    document.getElementById('modal-title').textContent='Nuevo proyecto';
+    document.getElementById('modal-sub').textContent='Los campos con * son obligatorios';
+    submitBtn.textContent='Crear proyecto';
+    submitBtn.onclick=handleSubmit;
+    document.getElementById('modal-body').innerHTML=buildCreateForm();
+    editCandidatos=[];
+  } else if(mode==='edit'){
+    const p=proyectos.find(x=>x.id===id);if(!p)return;
+    selectedId=id;editCandidatos=[...(p.candidatos||[])];
+    document.getElementById('modal-title').textContent='Editar proyecto';
+    document.getElementById('modal-sub').textContent=`${p.id} · ${p.nombreComercial}`;
+    submitBtn.textContent='Guardar cambios';
+    submitBtn.onclick=handleSubmit;
+    document.getElementById('modal-body').innerHTML=buildEditForm(p);
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
+function handleOverlayClick(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+
+function validateCreate() {
+  let valid=true;
+  const isExp=document.getElementById('f-categoria').value==='Expansión';
+  [['f-nombre','err-nombre'],['f-region','err-region'],['f-zona','err-zona'],['f-dpto','err-dpto'],['f-ciudad','err-ciudad'],['f-resp','err-resp'],['f-fecha','err-fecha']].forEach(([id,err])=>{
+    const el=document.getElementById(id);const errEl=document.getElementById(err);
+    if(el&&!el.value.trim()){el.classList.add('error');if(errEl)errEl.classList.add('show');valid=false;}
+    else if(el){el.classList.remove('error');if(errEl)errEl.classList.remove('show');}
+  });
+  if(isExp){['f-nit','f-canal'].forEach(id=>{const el=document.getElementById(id);const errEl=document.getElementById('err-'+id.replace('f-',''));if(el&&!el.value.trim()){el.classList.add('error');if(errEl)errEl.classList.add('show');valid=false;}});}
+  return valid;
+}
+
+function getMissingForAdvance(p,newEtapa) {
+  const currentIdx=ETAPAS.indexOf(p.etapa);
+  const newIdx=ETAPAS.indexOf(newEtapa);
+  if(newIdx<=currentIdx) return [];
+  const cfg=STAGE_REQUIRED[p.etapa]||{};
+  const labels={'e-pits-teo':'Pits teóricos','e-tamano':'Tamaño','e-tipif':'Tipificación','e-m2':'Metros cuadrados','e-canal':'Canal','e-pits-def':'Pits definidos','e-pits-ini':'Pits iniciales','e-pits-proy':'Pits proyectados','e-fecha':'Inicio operación estimado'};
+  const g=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  const missing=[];
+  (cfg.advanceReq||[]).forEach(f=>{if(!g(f).trim())missing.push(labels[f]||f);});
+  if(['3.1 Selección de Candidato','3.2 Alineación candidato'].includes(p.etapa)&&editCandidatos.length===0) missing.push('Al menos un candidato');
+  if(newEtapa==='8. Operando'&&p.tipo==='Apertura'&&!g('e-nit').trim()) missing.push('NIT-SUCURSAL');
+  return missing;
+}
+
+async function handleSubmit() {
+  if(modalMode==='create'){
+    if(!validateCreate()){showToast('Completa los campos obligatorios','error');return;}
+    const tipo=document.getElementById('f-categoria').value;
+    const nuevo={
+      id:`PRE${Date.now()}`,spId:null,hasBP:false,tipo,
+      region:document.getElementById('f-region').value,zona:document.getElementById('f-zona').value,
+      nombreComercial:document.getElementById('f-nombre').value.trim(),
+      razonSocial:document.getElementById('f-razon').value.trim(),
+      departamento:document.getElementById('f-dpto').value,ciudad:document.getElementById('f-ciudad').value,
+      categoria:tipo,tipoPriorizacion:document.getElementById('f-prior').value,
+      inicioProyecto:document.getElementById('f-inicio').value,tamano:'',etapa:ETAPAS[0],
+      propuestaTiempoDd:document.getElementById('f-fecha').value,
+      responsable:document.getElementById('f-resp').value,
+      comentario:document.getElementById('f-comentario').value.trim(),
+      ejecucion:0,nitSucursal:tipo==='Expansión'?document.getElementById('f-nit').value.trim():'',
+      canal:tipo==='Expansión'?document.getElementById('f-canal').value.trim():'',
+      inversionDd:'',inversionPosventa:'',inversionPosvMercadeo:'',inversionMercadeo:'',
+      pitsActuales:0,pitsProyectados:0,pitsTeóricos:0,pitsDefinidos:0,pitsIniciales:0,
+      metrosCuadrados:0,trabajar:'Si',tipificacion:'',candidatos:[],
+      ultimaActualizacion:new Date().toISOString().split('T')[0],historial:[]
+    };
+    setSyncStatus('loading','Guardando...');
+    const ok=await saveToSharePoint(nuevo);
+    if(ok){
+      proyectos.push(nuevo);
+      closeModal();renderTable();updateCounts();
+      showToast('Proyecto creado en SharePoint. Aprobar BP para asignar ID oficial.','success');
+      openDetail(nuevo.id);
+    }
+    setSyncStatus('ok','Guardado');
+  } else if(modalMode==='edit'){
+    const p=proyectos.find(x=>x.id===selectedId);if(!p)return;
+    const g=id=>{const el=document.getElementById(id);return el?el.value:'';};
+    const newEtapa=g('e-etapa');
+    const missing=getMissingForAdvance(p,newEtapa);
+    if(missing.length>0){
+      showDoubleConfirm('⚠️ Faltan campos para esta etapa',
+        `Avanzando a "<strong>${newEtapa}</strong>" sin completar:<br><br><ul style="margin-left:20px;margin-top:4px">${missing.map(m=>`<li>${m}</li>`).join('')}</ul><br>¿Está seguro?`,
+        ()=>showDoubleConfirm('¿Confirmar definitivamente?','Segunda confirmación. Los campos requeridos quedarán incompletos. ¿Guardar de todas formas?',()=>doSaveEdit(p)));
+    } else { doSaveEdit(p); }
+  }
+}
+
+async function doSaveEdit(p) {
+  const g=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  const today=new Date().toISOString().split('T')[0];
+  const changes=[];
+  const track=(label,oldVal,newVal)=>{if(String(oldVal||'')!==String(newVal||''))changes.push({label,from:oldVal||'—',to:newVal||'—'});};
+  track('Etapa',p.etapa,g('e-etapa'));
+  track('% Ejecución',p.ejecucion,parseInt(g('e-ejec'))||0);
+  track('Inicio operación est.',p.propuestaTiempoDd,g('e-fecha'));
+  track('Responsable',p.responsable,g('e-resp'));
+  track('Tamaño',p.tamano,g('e-tamano'));
+  track('Tipificación',p.tipificacion,g('e-tipif'));
+  track('Pits teóricos',p.pitsTeóricos,parseInt(g('e-pits-teo'))||0);
+  track('Pits definidos',p.pitsDefinidos,parseInt(g('e-pits-def'))||0);
+  track('Pits iniciales',p.pitsIniciales,parseInt(g('e-pits-ini'))||0);
+  track('Pits proyectados',p.pitsProyectados,parseInt(g('e-pits-proy'))||0);
+  track('Canal',p.canal,g('e-canal'));
+  track('NIT-SUCURSAL',p.nitSucursal,g('e-nit'));
+  p.etapa=g('e-etapa');p.ejecucion=parseInt(g('e-ejec'))||0;p.propuestaTiempoDd=g('e-fecha');
+  p.responsable=g('e-resp');p.tamano=g('e-tamano');p.tipificacion=g('e-tipif');
+  p.trabajar=g('e-trabajar');p.nitSucursal=g('e-nit');p.canal=g('e-canal');p.comentario=g('e-comentario');
+  p.pitsActuales=parseInt(g('e-pits-act'))||0;p.pitsTeóricos=parseInt(g('e-pits-teo'))||0;
+  p.pitsDefinidos=parseInt(g('e-pits-def'))||0;p.pitsIniciales=parseInt(g('e-pits-ini'))||0;
+  p.pitsProyectados=parseInt(g('e-pits-proy'))||0;p.metrosCuadrados=parseInt(g('e-m2'))||0;
+  p.inversionDd=g('e-inv-dd');p.inversionPosventa=g('e-inv-pos');
+  p.inversionPosvMercadeo=g('e-inv-posm');p.inversionMercadeo=g('e-inv-mer');
+  p.candidatos=[...editCandidatos];
+  if(changes.length>0){if(!p.historial)p.historial=[];p.historial.unshift({fecha:today,cambios:changes});if(p.historial.length>50)p.historial=p.historial.slice(0,50);}
+  p.ultimaActualizacion=today;
+  setSyncStatus('loading','Guardando...');
+  const ok=await saveToSharePoint(p);
+  if(ok){ await saveCandidatesToSharePoint(p); }
+  closeModal();
+  document.getElementById('confirm-overlay').style.display='none';
+  renderTable();updateCounts();openDetail(selectedId);
+  showToast(ok?'Cambios guardados en SharePoint':'Cambios guardados localmente (error de sync)',ok?'success':'error');
+  setSyncStatus(ok?'ok':'error',ok?'Guardado':'Error');
+}
+
+function showDoubleConfirm(title,body,onConfirm) {
+  document.getElementById('confirm-title').textContent=title;
+  document.getElementById('confirm-body').innerHTML=body;
+  document.getElementById('confirm-ok').onclick=onConfirm;
+  document.getElementById('confirm-overlay').style.display='flex';
+}
+
+function showToast(msg,type) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(type==='success'?' toast-success':type==='error'?' toast-error':type==='info'?' toast-info':'');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+populateFilters();
+renderTable();
+updateCounts();
+initAuth();
+</script>
+</body>
+</html>
